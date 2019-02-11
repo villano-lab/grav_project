@@ -1,0 +1,23 @@
+{
+cout << "******************************" << endl;
+cout << "*  Welcome to ROOT v" << gROOT->GetVersion() << "  *" << endl;
+cout << "******************************" << endl;
+cout << endl;
+char *inc1 = gSystem->ExpandPathName("./root/");
+char *inc2 = gSystem->ExpandPathName("./cuts/");
+char *inc3 = gSystem->ExpandPathName("./");
+gInterpreter->AddIncludePath(inc1);
+gInterpreter->AddIncludePath(inc2);
+gInterpreter->AddIncludePath(inc3);
+delete [] inc1;
+delete [] inc2;
+delete [] inc3;
+
+//extend the macro path
+char *macropath = gROOT->GetMacroPath();
+char longerpath[256];
+sprintf(longerpath,"./root:./cuts:%s",macropath);
+gROOT->SetMacroPath(longerpath);
+printf("macro path: %s\n",longerpath);
+gSystem->Load("clibs/libfetchData.so");
+}
