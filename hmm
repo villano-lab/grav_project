@@ -1,0 +1,35 @@
+import numpy as np
+import matplotlib as mpl
+from matplotlib import pyplot as plt
+
+#parameters
+r0 = 1533 #in pc
+sigb = 5.12e6 #solar masses per pc^2
+
+
+x_0=1533.0  #using this instead of r. in parsec
+sig_b = lambda x: np.exp(-np.power(x/x_0,(1/4)))
+
+vec_sig_b = np.vectorize(sig_b)
+
+fig,axes = plt.subplots(1,1,figsize=(9.0,8.0),sharex=True)
+ax1 = axes
+
+X = np.arange(0.0,10,0.01)
+ax1.plot(X,vec_sig_b(X), color='k', linestyle='-', \
+         label='mass density of bulge', linewidth=2)
+
+ax1.set_yscale('log')
+ax1.set_xlim(0, 10) #in pairs
+ax1.set_ylim(6e-1,1)
+ax1.set_xlabel('disc coordinate [pc]')
+ax1.set_ylabel('\Sigma')
+ax1.grid(True)
+ax1.yaxis.grid(True,which='minor',linestyle='--')
+ax1.legend(loc=1,prop={'size':22})
+
+for axis in ['top','bottom','left','right']:              #sets the axis linewidth to 2
+  ax1.spines[axis].set_linewidth(2)
+
+plt.tight_layout()
+plt.show()
