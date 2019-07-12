@@ -3,7 +3,6 @@
 #Imports
 import numpy as np
 import sympy as sym
-from matplotlib import pyplot as plt
 from scipy.integrate import quad
 from scipy.integrate import dblquad
 from scipy.special import ellipe
@@ -65,5 +64,5 @@ F = lambda r: 4*np.pi*G*intintf(r)*pref
 ######################################################################################################################
 #Disk Velocity
 rd = np.linspace(0.1, 125, num=100)
-Fv = np.vectorize(F)
-vd = np.sqrt(-rd*Fv(rd)) 
+Fv = np.vectorize(F)                                  #save to file, open file, calculate for requested h if not already hdf5, h5py
+vd = np.sqrt(-rd*Fv(rd))                            

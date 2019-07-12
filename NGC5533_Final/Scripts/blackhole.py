@@ -1,7 +1,5 @@
 #Imports
 import numpy as np
-import matplotlib as mpl
-from matplotlib import pyplot as plt
 
 #Constants
 Mbh = 2.7e9                                                 #mass of the central black hole in (solar mass)
