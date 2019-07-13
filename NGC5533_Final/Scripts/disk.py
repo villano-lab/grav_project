@@ -67,4 +67,24 @@ F = lambda r: 4*np.pi*G*intintf(r)*pref
 #Disk Velocity
 rd = np.linspace(0.1, 125, num=100)
 Fv = np.vectorize(F)                                  #save to file, open file, calculate for requested h if not already hdf5, h5py
-vd = np.sqrt(-rd*Fv(rd))                            
+for i in rd:
+    vd[i] = np.sqrt(-rd[i]*Fv(rd[i]))       
+
+######################################## Save vd for given h #########################################################
+
+hval = "h"+str(h)
+
+try:
+    saved = h5.File("inputs.hdf5","w")
+except OSError:
+    saved = h5.File("inputs.hdf5","r")
+    
+try:
+    grp = f.create_group("disk")
+except RuntimeError:
+    grp = f["disk"]
+
+try:                                                
+    dset = grp.create_dataset(nval,vb,dtype='a')
+except ValueError:
+    dset = grp[hval]

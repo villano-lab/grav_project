@@ -42,3 +42,22 @@ for j,r in enumerate(x):
 
 #Final Equation
 vb = np.sqrt(y)
+
+######################################## Save vb for given n ##########################################
+
+nval = "n"+str(n)
+
+try:
+    saved = h5.File("inputs.hdf5","w")
+except OSError:
+    saved = h5.File("inputs.hdf5","r")
+    
+try:
+    grp = f.create_group("bulge")
+except RuntimeError:
+    grp = f["bulge"]
+
+try:                                                
+    dset = grp.create_dataset(nval,vb,dtype='a')
+except ValueError:
+    dset = grp[nval]
