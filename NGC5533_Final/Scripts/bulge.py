@@ -1,9 +1,9 @@
 #Imports
-import numpy as np
-from scipy.integrate import quad
-from scipy.integrate import dblquad
-import scipy.optimize as so
-import scipy.special as ss
+#import numpy as np
+#from scipy.integrate import quad
+#from scipy.integrate import dblquad
+#import scipy.optimize as so
+#import scipy.special as ss
 
 #Constants
 n = 2.7                                     #concentration parameter that describes the curvature of the profile in a radius-magnitude plot, n=4 is de Vaucoileurs profile
@@ -35,7 +35,6 @@ e2 = 1-(q**2)
 h = lambda m,r: C*g(m)*(m**2)/(np.sqrt((r**2)-((m**2)*(e2))))
 
 y = np.zeros(np.shape(x))
-hr = lambda m: h(m,r)
 for j,r in enumerate(x):
     y[j] = quad(h, 0, r,args=(r,))[0]
 
