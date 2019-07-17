@@ -25,13 +25,15 @@ try:
     saved = h5.File("inputs.hdf5","w")
 except OSError:
     saved = h5.File("inputs.hdf5","r")
-    
+
 try:
     grp = saved.create_group("bulge")
-except RuntimeError:
+except ValueError:
     grp = saved["bulge"]
 
 try:     
+    vb = grp[nval]
+except KeyError:
     #Gamma Function
     f = lambda x: ss.gammainc(2*n,x)*ss.gamma(2*n)-0.5*ss.gamma(2*n)
     root = so.brentq(f,0,500000,rtol=0.000001,maxiter=100) #come within 1% of exact root within 100 iterations
@@ -57,6 +59,4 @@ try:
 
     #Final Equation
     vb = np.sqrt(y)
-    dset = grp[nval]
-except KeyError:
-    dset = grp.create_dataset(nval,vb,dtype='a')
+    grp.create_dataset(nval,data=vb)
