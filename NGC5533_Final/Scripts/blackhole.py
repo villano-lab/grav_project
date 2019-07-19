@@ -6,5 +6,5 @@
 #G = 4.300e-6                                                #gravitational constant (kpc/solar mass*(km/s)^2)
 
 #equation for orbital velocity
-def vbh(r, G, Mbh):
+def vbh(r):
     return np.sqrt((G*Mbh)/r)
