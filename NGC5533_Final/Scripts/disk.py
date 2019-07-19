@@ -33,12 +33,12 @@ except ValueError:
     grp = saved["disk"]
 
 try:                                                
-    vd = grp[hval]
+    vd = grp[hval].value
 except KeyError:                                                                                                    #calculate vd and save it for hval
-    def x(r,u,xi):                                                                                                  #Define Initial Functions
+    def x0(r,u,xi):
         return ((r**2)+(u**2)+(xi**2))/(2*r*u)
-    def px(r,u,xi):
-        return x(r,u,xi)-(np.sqrt((x(r,u,xi)**2)-1))
+    def px(r,u,xi):                                                                                                 #Define Initial Functions
+        return x0(r,u,xi)-(np.sqrt((x0(r,u,xi)**2)-1))        
     def rho0(r, R, h, d):                                                                                           #Density Piecewise Function                                   
         condlist = [r <= R, (r > R) & (r <= (R+d)), r > (R+d)]
         funclist = [lambda r: rho00*np.exp(-r/h), lambda r: rho00*np.exp(-R/h)*(1-((r-R)/d)), lambda r: 0]
@@ -54,11 +54,12 @@ except KeyError:                                                                
     intf = lambda u,r: quad(f, 0, np.inf, args=(r,u,))[0]                                                           #Integrate Function
     intintf = lambda r: nquad(intf, [[0.1, 125]], args=(r,),opts=[options,options])[0]                              #integrate outer function
     rho_rz_r = lambda z,r: rho_rz(r,z)*r                                                                            #mass of disk
-    Mdblintrho = dblquad(rho_rz_r,0,125,-125,125)                                                                   #epsdisk = Mdblintrho/L0
+    Mintrho = lambda r: quad(rho_rz_r, -125, 125, args=(r,))[0]
+    Mdblintrho = quad(Mintrho, 0, 125)[0]                                                                           #epsdisk = Mdblintrho/L0
     pref = epsdisk*(L0/Mdblintrho)                                                                                  #multiplying by epsylon
     F = lambda r: 4*np.pi*G*intintf(r)*pref
     rd = np.linspace(0.1, 125, num=100)                                                                             #Disk Velocity
-    Fv = np.vectorize(F)                                  
+    Fv = np.vectorize(F)     
     vd = np.sqrt(-rd*Fv(rd))
     vd[np.isnan(vd)] = 0                                                                                            
     grp.create_dataset(hval,data=vd)                                                                                #save to file, open file, calculate for requested h if not already hdf5, h5py

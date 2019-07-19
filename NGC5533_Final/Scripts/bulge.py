@@ -32,7 +32,7 @@ except ValueError:
     grp = saved["bulge"]
 
 try:     
-    vb = grp[nval]
+    vb = grp[nval].value
 except KeyError:
     #Gamma Function
     f = lambda x: ss.gammainc(2*n,x)*ss.gamma(2*n)-0.5*ss.gamma(2*n)
@@ -49,11 +49,11 @@ except KeyError:
     e2 = 1-(q**2)
 
     #integrate outer function
-    h = lambda m,r: C*g(m)*(m**2)/(np.sqrt((r**2)-((m**2)*(e2))))
+    H = lambda m,r: C*g(m)*(m**2)/(np.sqrt((r**2)-((m**2)*(e2))))                                                 #Was initially h. Changed to prevent overwriting of variable h.
 
-    y = np.zeros(np.shape(x))
-    for j,r in enumerate(x):
-        y[j] = quad(h, 0, r,args=(r,))[0]
+    y = np.zeros(np.shape(xd))
+    for j,r in enumerate(xd):
+        y[j] = quad(H, 0, r,args=(r,))[0]
 
     #######################################################################################################
 
