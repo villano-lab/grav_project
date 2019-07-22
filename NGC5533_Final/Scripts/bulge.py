@@ -1,5 +1,6 @@
 #Imports
 #import numpy as np
+#import h5py as h5
 #from scipy.integrate import quad
 #from scipy.integrate import dblquad
 #import scipy.optimize as so
@@ -19,12 +20,13 @@
 
 ######################################## Save vb for given n ##########################################
 
+r0id = "varray_"+str(r0[0])+"-"+str(r0[len(r0)-1])+"_"+str(len(r0))+".hdf5"
 nval = "n"+str(n)
 
 try:
-    saved = h5.File("inputs.hdf5","w")
+    saved = h5.File(r0id,"w")
 except OSError:
-    saved = h5.File("inputs.hdf5","r")
+    saved = h5.File(r0id,"r")
 
 try:
     grp = saved.create_group("bulge")
@@ -32,31 +34,28 @@ except ValueError:
     grp = saved["bulge"]
 
 try:     
-    vb = grp[nval].value
+    vb = grp[nval]
 except KeyError:
     #Gamma Function
     f = lambda x: ss.gammainc(2*n,x)*ss.gamma(2*n)-0.5*ss.gamma(2*n)
     root = so.brentq(f,0,500000,rtol=0.000001,maxiter=100) #come within 1% of exact root within 100 iterations
-    r0 = re/root**n
+    ra = re/root**n
 
-
-    ########################################Intermediate Equations#########################################
-
-    f = lambda x,m: ((np.exp(-np.power(x/r0, (1/n))))*(np.power(x/r0, ((1/n)-1))))/(np.sqrt((x**2)-(m**2)));
-    g = lambda m: quad(f, m, np.inf,args=(m,))[0]
-    I0 = (L*(root**(2*n)))/(((re**2)*2*np.pi*n)*ss.gamma(2*n))
-    C = (4*G*q*ups*I0)/(r0*np.float(n))*(np.sqrt((np.sin(i)**2)+(1/(q**2))*(np.cos(i)**2)))
-    e2 = 1-(q**2)
-
-    #integrate outer function
-    H = lambda m,r: C*g(m)*(m**2)/(np.sqrt((r**2)-((m**2)*(e2))))                                                 #Was initially h. Changed to prevent overwriting of variable h.
-
-    y = np.zeros(np.shape(xd))
-    for j,r in enumerate(xd):
-        y[j] = quad(H, 0, r,args=(r,))[0]
-
-    #######################################################################################################
-
-    #Final Equation
-    vb = np.sqrt(y)
-    grp.create_dataset(nval,data=vb)
+    #Functions
+    def vb(r):
+        f = lambda x,m: ((np.exp(-np.power(x/ra, (1/n))))*(np.power(x/ra, ((1/n)-1))))/(np.sqrt((x**2)-(m**2)));
+        g = lambda m: quad(f, m, np.inf,args=(m,))[0]
+        I0 = (L*(root**(2*n)))/(((re**2)*2*np.pi*n)*ss.gamma(2*n))
+        C = (4*G*q*ups*I0)/(ra*np.float(n))*(np.sqrt((np.sin(i)**2)+(1/(q**2))*(np.cos(i)**2)))
+        e2 = 1-(q**2)
+        H = lambda m,r: C*g(m)*(m**2)/(np.sqrt((r**2)-((m**2)*(e2))))
+        y = lambda r: quad(H,0,r,args=(r,))[0]
+        return y(r)**0.5
+    
+    #Calculate
+    vbr = np.zeros(len(r0))
+    for i,n in enumerate(r0):
+        vbr[i] = vb(n)
+    
+    #Save
+    grp.create_dataset(nval,data=vbr)

@@ -20,12 +20,13 @@
 
 ######################################## Save vd for given h #########################################################
 
+r0id = "varray_"+str(r0[0])+"-"+str(r0[len(r0)-1])+"_"+str(len(r0))+".hdf5"
 hval = "h"+str(h)
 
 try:
-    saved = h5.File("inputs.hdf5","w")
+    saved = h5.File(r0id,"w")
 except OSError:
-    saved = h5.File("inputs.hdf5","r")
+    saved = h5.File(r0id,"r")
     
 try:
     grp = saved.create_group("disk")
@@ -33,8 +34,9 @@ except ValueError:
     grp = saved["disk"]
 
 try:                                                
-    vd = grp[hval].value
+    vd = grp[hval]
 except KeyError:                                                                                                    #calculate vd and save it for hval
+    #Equations
     def x0(r,u,xi):
         return ((r**2)+(u**2)+(xi**2))/(2*r*u)
     def px(r,u,xi):                                                                                                 #Define Initial Functions
@@ -58,8 +60,17 @@ except KeyError:                                                                
     Mdblintrho = quad(Mintrho, 0, 125)[0]                                                                           #epsdisk = Mdblintrho/L0
     pref = epsdisk*(L0/Mdblintrho)                                                                                  #multiplying by epsylon
     F = lambda r: 4*np.pi*G*intintf(r)*pref
-    rd = np.linspace(0.1, 125, num=100)                                                                             #Disk Velocity
-    Fv = np.vectorize(F)     
-    vd = np.sqrt(-rd*Fv(rd))
-    vd[np.isnan(vd)] = 0                                                                                            
-    grp.create_dataset(hval,data=vd)                                                                                #save to file, open file, calculate for requested h if not already hdf5, h5py
+    
+    #Final Function
+    #rd = np.linspace(0.1, 125, num=100)                                                                             
+    #Fv = np.vectorize(F)                                                                                            #Disk Velocity
+    vd = lambda r: np.sqrt(-r*F(r))
+    
+    #Calculate
+    vdr = np.zeros(len(r0))
+    for i,n in enumerate(r0):
+        vdr[i] = vd(n)
+    vdr[np.isnan(vdr)] = 0                                                                                          #Set all nan to 0
+    
+    #Save
+    grp.create_dataset(hval,data=vdr)                                                                                #save to file, open file, calculate for requested h if not already hdf5, h5py
