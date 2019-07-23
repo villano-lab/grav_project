@@ -21,12 +21,13 @@
 ######################################## Save vb for given n ##########################################
 
 r0id = "varray_"+str(r0[0])+"-"+str(r0[len(r0)-1])+"_"+str(len(r0))+".hdf5"
+location = "Inputs/"+r0id
 nval = "n"+str(n)
 
 try:
-    saved = h5.File(r0id,"w")
+    saved = h5.File(location,"w")
 except OSError:
-    saved = h5.File(r0id,"r")
+    saved = h5.File(location,"r")
 
 try:
     grp = saved.create_group("bulge")
@@ -34,11 +35,14 @@ except ValueError:
     grp = saved["bulge"]
 
 try:     
-    vb = grp[nval]
+    #Open
+    vbd = grp[nval]
+    #Read
+    vbr = vbd[:]
 except KeyError:
     #Gamma Function
-    f = lambda x: ss.gammainc(2*n,x)*ss.gamma(2*n)-0.5*ss.gamma(2*n)
-    root = so.brentq(f,0,500000,rtol=0.000001,maxiter=100) #come within 1% of exact root within 100 iterations
+    f1 = lambda x: ss.gammainc(2*n,x)*ss.gamma(2*n)-0.5*ss.gamma(2*n)
+    root = so.brentq(f1,0,500000,rtol=0.000001,maxiter=100) #come within 1% of exact root within 100 iterations
     ra = re/root**n
 
     #Functions

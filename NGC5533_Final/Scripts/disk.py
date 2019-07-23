@@ -21,20 +21,24 @@
 ######################################## Save vd for given h #########################################################
 
 r0id = "varray_"+str(r0[0])+"-"+str(r0[len(r0)-1])+"_"+str(len(r0))+".hdf5"
+location = "Inputs/"+r0id
 hval = "h"+str(h)
 
 try:
-    saved = h5.File(r0id,"w")
+    saved = h5.File(location,"w")
 except OSError:
-    saved = h5.File(r0id,"r")
+    saved = h5.File(location,"r")
     
 try:
     grp = saved.create_group("disk")
 except ValueError:
     grp = saved["disk"]
 
-try:                                                
-    vd = grp[hval]
+try:   
+    #Open
+    vdd = grp[hval]
+    #Read
+    vdr = vdd[:]
 except KeyError:                                                                                                    #calculate vd and save it for hval
     #Equations
     def x0(r,u,xi):
