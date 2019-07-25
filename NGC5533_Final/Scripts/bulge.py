@@ -50,8 +50,8 @@ except KeyError:
 
     #Functions
     def vb(r):
-        f = lambda x,m: ((np.exp(-np.power(x/ra, (1/n))))*(np.power(x/ra, ((1/n)-1))))/(np.sqrt((x**2)-(m**2)));
-        g = lambda m: quad(f, m, np.inf,args=(m,))[0]
+        fb = lambda x,m: ((np.exp(-np.power(x/ra, (1/n))))*(np.power(x/ra, ((1/n)-1))))/(np.sqrt((x**2)-(m**2)));
+        g = lambda m: quad(fb, m, np.inf,args=(m,))[0]
         I0 = (L*(root**(2*n)))/(((re**2)*2*np.pi*n)*ss.gamma(2*n))
         C = (4*G*q*ups*I0)/(ra*np.float(n))*(np.sqrt((np.sin(i)**2)+(1/(q**2))*(np.cos(i)**2)))
         e2 = 1-(q**2)

@@ -21,9 +21,9 @@
 ######################################## Save vd for given h #########################################################
 
 #Savedata name values
-r0id = "varray_"+str(r0[0])+"-"+str(r0[len(r0)-1])+"_"+str(len(r0))+".hdf5"
+#r0id = "varray_"+str(r0[0])+"-"+str(r0[len(r0)-1])+"_"+str(len(r0))+".hdf5"
 #location = "Inputs/"+r0id
-#hval = "h"+str(h)
+hval = "h"+str(h)
 
 #Load savedata if available, else create file
 #try:
@@ -55,7 +55,7 @@ except KeyError:                                                                
         condlist = [r <= R, (r > R) & (r <= (R+d)), r > (R+d)]
         funclist = [lambda r: -(1/h)*rho00*np.exp(-r/h), lambda r: -(1/d)*rho00*np.exp(-R/h), lambda r: 0]
         return np.piecewise(r, condlist, funclist)
-    rho_rz = lambda r,z: rho0(r, R, h, d)*(np.power(np.cosh(z/z0), (-2)))                                           #Disk Density Distribution
+    rho_rz = lambda r,z: rho0(r, R, h, d)*(np.power(sym.cosh(z/z0).evalf(), (-2)))                                           #Disk Density Distribution
     drho_rz = lambda r,z: durho0(r, R, h, d)*(np.power(np.cosh(z/z0), -2))
     K = lambda r,u,xi: ellipk(px(r,u,xi)) - ellipe(px(r,u,xi))                                                      #Complete Elliptic Integral
     f = lambda z,r,u: u*drho_rz(u, z)*(2*K(r,u,z))/(np.pi*np.sqrt(r*u*px(r,u,z)))                                   #Inner Function (3D)                                                                                 
