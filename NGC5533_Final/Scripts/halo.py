@@ -6,14 +6,16 @@
 #G = 4.300e-6                                                #gravitational constant (kpc/solar mass*(km/s)^2)
 #rho00 = 0.31e9                                              #central surface density (solar mass/kpc^3)
 
-r0id = "varray_"+str(r0[0])+"-"+str(r0[len(r0)-1])+"_"+str(len(r0))+".hdf5"
-location = "Inputs/r0id"
+#Savedata Naming Values
+#r0id = "varray_"+str(r0[0])+"-"+str(r0[len(r0)-1])+"_"+str(len(r0))+".hdf5"
+#location = "Inputs/r0id"
 r00val = "r00"+str(rho00)
 
-try:
-    saved = h5.File(location,"w")
-except OSError:
-    saved = h5.File(location,"r")
+#Load if available, else create
+#try:
+#    saved = h5.File(location,"w")
+#except OSError:
+#    saved = h5.File(location,"r")
 
 try:
     grp = saved.create_group("halo")

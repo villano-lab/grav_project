@@ -20,14 +20,17 @@
 
 ######################################## Save vb for given n ##########################################
 
-r0id = "varray_"+str(r0[0])+"-"+str(r0[len(r0)-1])+"_"+str(len(r0))+".hdf5"
-location = "Inputs/"+r0id
+
+#Savedata naming conventions
+#r0id = "varray_"+str(r0[0])+"-"+str(r0[len(r0)-1])+"_"+str(len(r0))+".hdf5"
+#location = "Inputs/"+r0id
 nval = "n"+str(n)
 
-try:
-    saved = h5.File(location,"w")
-except OSError:
-    saved = h5.File(location,"r")
+#Load savedata if available, else build
+#try:
+#    saved = h5.File(location,"w")
+#except OSError:
+#    saved = h5.File(location,"r")
 
 try:
     grp = saved.create_group("bulge")

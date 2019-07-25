@@ -1,18 +1,22 @@
 #Imports
 #import numpy as np
+#import h5py as h5
 
 #Constants
 #Mbh = 2.7e9                                                 #mass of the central black hole in (solar mass)
 #G = 4.300e-6                                                #gravitational constant (kpc/solar mass*(km/s)^2)
+#r0 = np.linspace(0,1,2)
 
-r0id = "varray_"+str(r0[0])+"-"+str(r0[len(r0)-1])+"_"+str(len(r0))+".hdf5"
-location = "Inputs/"+r0id
-Mbhval = "Mbh"+str(n)
+#Savedata naming conventions
+#r0id = "varray_"+str(r0[0])+"-"+str(r0[len(r0)-1])+"_"+str(len(r0))+".hdf5"
+#location = "Inputs/"+r0id
+Mbhval = "Mbh"+str(Mbh)
 
-try:
-    saved = h5.File(location,"w")
-except OSError:
-    saved = h5.File(location,"r")
+#Attempt to load data, or build if not present
+#try:
+#    saved = h5.File(location,"w")
+#except OSError:
+#    saved = h5.File(location,"r")
 
 try:
     grp = saved.create_group("blackhole")
@@ -21,9 +25,9 @@ except ValueError:
 
 try:     
     #Open
-    vb = grp[Mbhval]
+    vbh = grp[Mbhval]
     #Read
-    vbr = vb[:]
+    vbhr = vbh[:]
 except KeyError:
     #equation for orbital velocity
     def vbh(r):
@@ -36,3 +40,5 @@ except KeyError:
     
     #Save
     grp.create_dataset(Mbhval,data=vbhr)
+    
+#print(vbhr)

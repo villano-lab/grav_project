@@ -20,14 +20,16 @@
 
 ######################################## Save vd for given h #########################################################
 
+#Savedata name values
 r0id = "varray_"+str(r0[0])+"-"+str(r0[len(r0)-1])+"_"+str(len(r0))+".hdf5"
-location = "Inputs/"+r0id
-hval = "h"+str(h)
+#location = "Inputs/"+r0id
+#hval = "h"+str(h)
 
-try:
-    saved = h5.File(location,"w")
-except OSError:
-    saved = h5.File(location,"r")
+#Load savedata if available, else create file
+#try:
+#    saved = h5.File(location,"w")
+#except OSError:
+#    saved = h5.File(location,"r")
     
 try:
     grp = saved.create_group("disk")
