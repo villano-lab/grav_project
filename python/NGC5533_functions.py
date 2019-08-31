@@ -2,6 +2,12 @@ import numpy as np
 import scipy.special as ss
 import scipy.optimize as so
 import scipy.integrate as si
+try:
+    import h5py as h5
+    set h5py = 1
+except:
+    set h5py = 0
+    print("Unable to load h5py. Datasets will not be saved or loaded.")
 
 #---------Definitely Constant---------
 G = 4.30091e-6    #gravitational constant (kpc/solar mass*(km/s)^2)
@@ -16,6 +22,7 @@ L0 = np.power(10, (0.4*(magsun-absmag))) #Absolute Magnitude to luminosity
 #---------Measured Indirectly---------
 ups = 2.8                         #mass-to-light ratio (from Rotation Curves of Sersic Bulges paper)
 q = 0.33                          #intrinsic axis ratio
+e2 = 1-(q**2)
 i = 45*(np.pi/180)                #inclination angle
 h = 8.9                           #radial scale-length (kpc)
 z0 = 0.2*h                        #half-thickness (kpc)
@@ -37,12 +44,30 @@ rs = (1/c)*(((3*Mvir)/((4*np.pi*100*rhocrit)))**(1/3))   #scale radius (kpc)
 rho_s = (100/3)*((c**3)/(np.log(1+c)-(c/(1+c))))*rhocrit #characteristic density
 h_gamma = 0
 
+def savedata(path,file,group,dataset,values):
+    if h5py == 1:
+        return 0
+    #Placeholder; I will design this to store information at a later date.
+    if h5py ==0:
+        print("ERROR: h5py was not loaded.")
+        return 1
+    
+def loaddata(path,file,group,dataset):
+    if h5py == 1:
+        saved = h5.File(path)
+        saved.close
+        return 0
+    #Placeholder; I will design this to store information at a later date.
+    if h5py ==0:
+        print("ERROR: h5py was not loaded.")
+        return 1
+
 ################################
 ######### Black Hole ###########
 ################################
 
 def bh_v(r,M=2.7e9): #M in solar masses, r in kpc
-  return np.sqrt(G*M/r)
+    return np.sqrt(G*M/r)
 
 ################################
 ########### Bulge ##############
@@ -51,28 +76,30 @@ def bh_v(r,M=2.7e9): #M in solar masses, r in kpc
 #I'm not sure how many of these we need to be defined -- I kept everything that was called outside of another function.
 #We can condense the number of functions once we know for certain if there are things we don't need again.
 
-def b_gammafunc(x):
-    f = ss.gammainc(2*n,x)*ss.gamma(2*n)-0.5*ss.gamma(2*n)
-    return so.brentq(f,0,500000,rtol=0.000001,maxiter=100) #come within 1% of exact root within 100 iterations
-
-def b_innerintegral(m):
-    f = lambda x,m: ((np.exp(-np.power(x/r0, (1/n))))*(np.power(x/r0, ((1/n)-1))))/(np.sqrt((x**2)-(m**2))); #Inner function
-    return si.quad(f, m, np.inf,args=(m,))[0]
-b_innerintegralv = np.vectorize(b_innerintegral)
+def b_gammafunc(x,n=2.7):
+    return ss.gammainc(2*n,x)*ss.gamma(2*n)-0.5*ss.gamma(2*n)
+b_root = so.brentq(b_gammafunc,0,500000,rtol=0.000001,maxiter=100) #come within 1% of exact root within 100 iterations
 
 def b_I0(n=2.7):
-    return L*(b_gammafunc**(2*n))/(((re**2)*2*np.pi*n)*ss.gamma(2*n))
+    return L*(b_root**(2*n))/(re**2*2*np.pi*n*ss.gamma(2*n))
 def b_r0(n=2.7):
-    return re/b_gammafunc**n
+    return re/np.power(b_root,n)
+
+def b_innerintegral(m,n=2.7):
+    f = lambda x,m,n: np.exp(-np.power(x/b_r0(n), (1/n)))*np.power(x/b_r0(n), 1/n-1)/(np.sqrt(x**2-m**2)) #Inner function
+    return si.quad(f, m, np.inf,args=(m,n))[0]
+b_innerintegralv = np.vectorize(b_innerintegral)
 
 def b_vsquare(r,n=2.7):
-    C = (4*G*q*ups*I0)/(r0*np.float(n))*(np.sqrt((np.sin(i)**2)+(1/(q**2))*(np.cos(i)**2)))
-    e2 = 1-(q**2)
-    h = lambda m,r: C*g(m)*(m**2)/(np.sqrt((r**2)-((m**2)*(e2)))) #integrate outer function
-    y = si.quad(h, 0, r, args=(r,n))[0]
-    return np.vectorize(y)
+    C = lambda n: (4*G*q*ups*b_I0(n))/(b_r0(n)*np.float(n))*(np.sqrt((np.sin(i)**2)+(1/(q**2))*(np.cos(i)**2)))
+    h = lambda m,r,n: C(n)*b_innerintegral(m,n)*(m**2)/(np.sqrt((r**2)-((m**2)*(e2)))) #integrate outer function
+    return si.quad(h, 0, r, args=(r,n))[0]
+def b_vsquarev(r,n=2.7):
+    return np.vectorize(b_vsquare, otypes=[np.float])
 def b_v(r,n=2.7):
-    return b_vsquare**(1/2)
+    return b_vsquare(r,n)**(1/2)
+    #unvec = lambda r,n: b_vsquare(r,n)**(1/2)
+    #return np.vectorize(unvec, otypes=[np.float])
 
 ################################
 ############ Halo ##############
