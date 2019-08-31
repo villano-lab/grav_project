@@ -4,9 +4,9 @@ import scipy.optimize as so
 import scipy.integrate as si
 try:
     import h5py as h5
-    set h5py = 1
+    h5py = 1
 except:
-    set h5py = 0
+    h5py = 0
     print("Unable to load h5py. Datasets will not be saved or loaded.")
 
 #---------Definitely Constant---------
