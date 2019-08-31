@@ -35,6 +35,7 @@ d_rho00 = 0.31e9                                         #prefactor that will ca
 epsdisk = 5.0                                            #from Noordermeer's paper
 rs = (1/c)*(((3*Mvir)/((4*np.pi*100*rhocrit)))**(1/3))   #scale radius (kpc)
 rho_s = (100/3)*((c**3)/(np.log(1+c)-(c/(1+c))))*rhocrit #characteristic density
+h_gamma = 0
 
 ################################
 ######### Black Hole ###########
@@ -80,20 +81,20 @@ def b_v(r,n=2.7):
 def h_rhat(r,z):               #r-hat from Casertano eq(9)
     return np.sqrt((r**2)+(z**2))
 
-def h_rho(r,rc=h_rc,rho00=h_rho00): #Isothermal Density Profile
+def h_rho(r,rho00=h_rho00,rc=h_rc): #Isothermal Density Profile
     return rho00*((1+((r/rc)**2))**(-1))
     
-def h_vcasertano(r,z,rc=h_rc,rho00=h_rho00,gamma=0):                                  #Velocity
-    v0h = lambda r,rho00,rc,z: np.sqrt(rho(r,rho00,rc)*4*np.pi*G*(rhat(r,z)**2)) #eq 9 casertano
+def h_vcasertano(r,z,rc=h_rc,rho00=h_rho00,gamma=h_gamma):                       #Velocity
+    v0h = lambda r,rho00,rc,z: np.sqrt(h_rho(r,rho00,rc)*4*np.pi*G*(h_rhat(r,z)**2)) #eq 9 casertano
     return v0h(r,rho00,rc,z)*((r/rc)**gamma)                                     #eq 10 casertano
 
-def h_vjimenez(r,rc,rho00=h_rho00):
+def h_vjimenez(r,rc=h_rc,rho00=h_rho00):
     return np.sqrt(4*np.pi*G*rho00*(rc**2)*(1-((rc/r)*np.arctan(r/rc))))
 
 def h_v(r):
     rho = lambda r: rho_s/((r/rs)*((1+r/rs)**2))
-    f = lambda r: 4*np.pi*rho(r)*(r**2)          #NFW Density Profile
-    mdm = lambda r: quad(f, 0, r)[0]             #M(r)
+    f = lambda R: 4*np.pi*rho(R)*(R**2)          #NFW Density Profile
+    mdm = lambda r: si.quad(f, 0, r)[0]             #M(r)
     vdm2 = lambda r: (G*mdm(r))/r                #v^2: GM(r)/r
     vdm2v = np.vectorize(vdm2)
     return np.sqrt(vdm2v(r))
