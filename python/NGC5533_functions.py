@@ -1,7 +1,7 @@
 ################################
 ########### Imports ############
 ################################
-
+import sys
 import numpy as np
 import scipy.special as ss
 import scipy.optimize as so
@@ -9,9 +9,9 @@ import scipy.integrate as si
 try:
     import h5py as h5
     h5py = 1
-except:
+except ModuleNotFoundError:
     h5py = 0
-    print("Unable to load h5py. Datasets will not be able to be saved or loaded using NGC5533_functions.")
+    print("Could not find h5py. Datasets will not be able to be saved or loaded using NGC5533_functions.")
 
 ################################
 ########## Settings ############
@@ -64,44 +64,67 @@ h_gamma = 0
 ########### Saving #############
 ################################
 
-def save(values,dataset,group,path='Inputs',file='x'+str(x[0])+'-'+str(x[len(x)-1])+'_'+str(len(x))):
+def savedata(values,dataset,group,path='Inputs/',file='r'+str(x[0])+'-'+str(x[len(x)-1])+'_'+str(len(x))):
     if h5py == 1:
         saved = h5.File(path+file)
-        if group in ['disk', 'Disk', 'disc', 'Disc', 'd', 'D']:
+        if group in ['Disk', 'disc', 'Disc', 'd', 'D']:
             group = 'disk'
             print("Group name set to 'disk'.")
-        if group in ['bh','Bh','BH','Black Hole','BlackHole','Blackhole,','blackhole','Black hole','black hole','Black Hole']:
+        if group in ['bh','Bh','BH','Black Hole','BlackHole','Blackhole,','Black hole','black hole','Black Hole']:
             group = 'blackhole'
             print("Group name set to 'blackhole'.")
-        if group in ['dm','DM','Dm','Dark Matter','Dark matter','dark matter','halo','h','H','Halo','darkmatter','Darkmatter','Dark Matter']:
+        if group in ['dm','DM','Dm','Dark Matter','Dark matter','dark matter','h','H','Halo','darkmatter','Darkmatter','DarkMatter']:
             group = 'halo'
             print("Group name set to 'halo'.")
-        if group in ['bulge','b','B','Bulge']:
+        if group in ['b','B','Bulge']:
             group = 'bulge'
             print("Group name set to 'bulge'.")
-        if group in ['t','T','total','Total']:
+        if group in ['t','T','Total']:
             group = 'total'
             print("Group name set to 'total'.")
         try:
             grp = saved.create_group(group)
             grp.create_dataset(dataset,data=values)
-        except KeyError:
+        except:
             grp = saved[group]
-            grp.create_dataset(dataset,data=values)
+            try:
+                grp.create_dataset(dataset,data=values)
+            except RuntimeError:
+                return loaddata(dataset,group,path,file)
+                print("Already exists! Loaded data.")
         saved.close()
         print("Saved.")
-    #Placeholder; I will design this to store information at a later date.
-    if h5py ==0:
+    if h5py == 0:
         print("ERROR: h5py was not loaded.")
         return 1
     
-def load(dataset,group,path='Inputs',file='x'+str(x[0])+'-'+str(x[len(x)-1])+'_'+str(len(x))):
+def loaddata(dataset,group,path='Inputs/',file='r'+str(x[0])+'-'+str(x[len(x)-1])+'_'+str(len(x))):
     if h5py == 1:
         saved = h5.File(path+file)
-        grp = saved[group]
-        dset = grp[dataset]
+        if group in ['Disk', 'disc', 'Disc', 'd', 'D']:
+            group = 'disk'
+            print("Group name set to 'disk'.")
+        if group in ['bh','Bh','BH','Black Hole','BlackHole','Blackhole,','Black hole','black hole','Black Hole']:
+            group = 'blackhole'
+            print("Group name set to 'blackhole'.")
+        if group in ['dm','DM','Dm','Dark Matter','Dark matter','dark matter','h','H','Halo','darkmatter','Darkmatter','Dark Matter']:
+            group = 'halo'
+            print("Group name set to 'halo'.")
+        if group in ['b','B','Bulge']:
+            group = 'bulge'
+            print("Group name set to 'bulge'.")
+        if group in ['t','T','Total']:
+            group = 'total'
+            print("Group name set to 'total'.")
+        try:
+            grp = saved[group]
+            dset = grp[dataset]
+        except KeyError:
+            print("No such group! Aborting.")
+            saved.close()
+            sys.exit
         return dset[:]
-        saved.close
+        saved.close()
     #Placeholder; I will design this to store information at a later date.
     if h5py ==0:
         print("ERROR: h5py was not loaded.")
@@ -111,11 +134,15 @@ def load(dataset,group,path='Inputs',file='x'+str(x[0])+'-'+str(x[len(x)-1])+'_'
 ######### Black Hole ###########
 ################################
 
-def bh_v(r,M=Mbh_def,save=True): #M in solar masses, r in kpc
-    return np.sqrt(G*M/r)
-    if save is True:
-        a = np.sqrt(G*M/x)
-        save(a,'Mbh'+str(M),'blackhole')
+def bh_v(r=x,M=Mbh_def,save=False,load=False,**kwargs): #M in solar masses, r in kpc
+    if save:
+        a = np.sqrt(G*M/r)
+        savedata(a,'Mbh'+str(M),'blackhole',file='r'+str(r[0])+'-'+str(r[len(r)-1])+'_'+str(len(r)),**kwargs)
+        return a
+    elif load:
+        return loaddata('Mbh'+str(M),'blackhole',file='r'+str(r[0])+'-'+str(r[len(r)-1])+'_'+str(len(r)),**kwargs)
+    else:
+        return np.sqrt(G*M/r)
 
 ################################
 ########### Bulge ##############
@@ -144,10 +171,16 @@ def b_vsquare(r,n=n_c):
     return si.quad(h, 0, r, args=(r,n))[0]
 def b_vsquarev(r,n=n_c):
     return np.vectorize(b_vsquare, otypes=[np.float])
-def b_v(r,n=n_c):
-    return b_vsquare(r,n)**(1/2)
-    #unvec = lambda r,n: b_vsquare(r,n)**(1/2)
-    #return np.vectorize(unvec, otypes=[np.float])
+
+def b_v(r,n=n_c,save=False,load=False,**kwargs):
+    if save:
+        a = b_vsquare(r,n)**(1/2)
+        savedata(a,'n'+str(n),'bulge',file='r'+str(r[0])+'-'+str(r[len(r)-1])+'_'+str(len(r)),**kwargs)
+        return a
+    elif load:
+        return loaddata('n'+str(n),'bulge',file='r'+str(r[0])+'-'+str(r[len(r)-1])+'_'+str(len(r)),**kwargs)
+    else:
+        return b_vsquare(r,n)**(1/2)
 
 ################################
 ############ Halo ##############
@@ -166,15 +199,20 @@ def h_vcasertano(r,z,rc=h_rc,rho00=h_rho00,gamma=h_gamma):                      
 def h_vjimenez(r,rc=h_rc,rho00=h_rho00):
     return np.sqrt(4*np.pi*G*rho00*(rc**2)*(1-((rc/r)*np.arctan(r/rc))))
 
-def h_v(r,save=True):
+def h_v(r,save=False,load=False,**kwargs):
     rho = lambda r: rho_s/((r/rs)*((1+r/rs)**2))
     f = lambda R: 4*np.pi*rho(R)*(R**2)          #NFW Density Profile
     mdm = lambda r: si.quad(f, 0, r)[0]          #M(r)
     vdm2 = lambda r: (G*mdm(r))/r                #v^2: GM(r)/r
     vdm2v = np.vectorize(vdm2)
-    return np.sqrt(vdm2v(r))
-    if save is True:
-        savedata()
+    if save:
+        a = np.sqrt(vdm2v(r))
+        savedata(a,'n'+str('PLACEHOLDER'),'halo',file='r'+str(r[0])+'-'+str(r[len(r)-1])+'_'+str(len(r)),**kwargs)
+        return a
+    elif load:
+        return loaddata('n'+str('PLACEHOLDER'),'halo',file='r'+str(r[0])+'-'+str(r[len(r)-1])+'_'+str(len(r)),**kwargs)
+    else:
+        return np.sqrt(vdm2v(r))
 
 ################################
 ############ Disk ##############
@@ -229,10 +267,24 @@ def d_F(r): #multiplying by upsylon
 d_Fv = np.vectorize(d_F)
 
 def d_v(r): #velocity
-    return np.sqrt(-r*d_Fv(r))
+    if save:
+        a = np.sqrt(-r*d_Fv(r))
+        savedata(a,'n'+str('PLACEHOLDER'),'disk',file='r'+str(r[0])+'-'+str(r[len(r)-1])+'_'+str(len(r)),**kwargs)
+        return a
+    elif load:
+        return loaddata('n'+str('PLACEHOLDER'),'disk',file='r'+str(r[0])+'-'+str(r[len(r)-1])+'_'+str(len(r)),**kwargs)
+    else:
+        return np.sqrt(-r*d_Fv(r))
 
 ################################
 ############ Total #############
 ################################
 def v(r,M=Mbh_def,n=n_c): 
-    return np.sqrt(h_v(r)**2+d_v(r)*d_v(r)+bh_v(r,M)**2+b_v(r,n)**2)
+    if save:
+        a = np.sqrt(np.sqrt(h_v(r)**2+d_v(r)*d_v(r)+bh_v(r,M)**2+b_v(r,n)**2))
+        savedata(a,'Mbh'+str(M)+'n'+str(n)+'n'+str('PLACEHOLDERx2'),'total',file='r'+str(r[0])+'-'+str(r[len(r)-1])+'_'+str(len(r)),**kwargs)
+        return a
+    elif load:
+        return loaddata('Mbh'+str(M)+'n'+str(n)+'n'+str('PLACEHOLDERx2'),'total',file='r'+str(r[0])+'-'+str(r[len(r)-1])+'_'+str(len(r)),**kwargs)
+    else:
+        return np.sqrt(h_v(r)**2+d_v(r)*d_v(r)+bh_v(r,M)**2+b_v(r,n)**2)
