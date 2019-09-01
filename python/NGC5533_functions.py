@@ -1,3 +1,7 @@
+################################
+########### Imports ############
+################################
+
 import numpy as np
 import scipy.special as ss
 import scipy.optimize as so
@@ -7,7 +11,17 @@ try:
     h5py = 1
 except:
     h5py = 0
-    print("Unable to load h5py. Datasets will not be saved or loaded.")
+    print("Unable to load h5py. Datasets will not be able to be saved or loaded.")
+
+################################
+########## Settings ############
+################################    
+
+options={'limit':100} #Sets maximum subdivisions to 100 for integration instead of 50
+
+################################
+########## Constants ###########
+################################    
 
 #---------Definitely Constant---------
 G = 4.30091e-6    #gravitational constant (kpc/solar mass*(km/s)^2)
@@ -131,8 +145,8 @@ def h_v(r):
 ################################
 
 def d_px(r,u,xi):       #Initial Function
-    x = ((r**2)+(u**2)+(xi**2))/(2*r*u)
-    return x-(np.sqrt((x(r,u,xi)**2)-1))
+    x = lambda r,u,xi: ((r**2)+(u**2)+(xi**2))/(2*r*u)
+    return x(r,u,xi)-(np.sqrt((x(r,u,xi)**2)-1))
 
 def d_rho0(r, R, h, d): #density piecewise function
     condlist = [r <= R, (r > R) & (r <= (R+d)), r > (R+d)]
@@ -157,26 +171,26 @@ def d_drho_rz3D(r, z):
     return d_durho0(r, R, h, d)*(np.power(np.cosh(z/z0), (-2)))
 
 def d_K(r,u,xi): #Complete Elliptic Integral
-    return ss.ellipk(px(r,u,xi)) - ss.ellipe(px(r,u,xi))
+    return ss.ellipk(d_px(r,u,xi)) - ss.ellipe(d_px(r,u,xi))
 
 def d_innerfunc(z,r,u):  #Inner Function (3D)
-    return u*d_drho_rz(u, z)*(2*K(r,u,z))/(np.pi*np.sqrt(r*u*px(r,u,z)))
+    return u*d_drho_rz(u, z)*(2*d_K(r,u,z))/(np.pi*np.sqrt(r*u*d_px(r,u,z)))
 
 def d_innerintegral(u,r): #Integrate Function
-    return si.quad(f, 0, np.inf, args=(r,u,))[0]
+    return si.quad(d_innerfunc, 0, np.inf, args=(r,u,))[0]
 
 def d_outerintegral(r): #Integrate Outer Function
-    return si.nquad(intf, [[0.1, 125]], args=(r,),opts=[options,options])[0]
+    return si.nquad(d_innerintegral, [[0.1, 125]], args=(r,),opts=[options,options])[0]
 
 def d_Mintrho(r):
     rho_rz_r = lambda z,r: d_rho_rz(r,z)*r
     return si.quad(rho_rz_r, -125, 125, args=(r,))[0]
 d_Mdblintrho = si.quad(d_Mintrho,0,125)[0]
 
-def d_Fv(r): #multiplying by upsylon
-    pref = epsdisk*(l0/Mdlbintrho)
-    F = 4*np.pi*G*d_outerintegral(r)*pref
-    return np.vectorize(F)   
+def d_F(r): #multiplying by upsylon
+    pref = epsdisk*(L0/d_Mdblintrho)
+    return 4*np.pi*G*d_outerintegral(r)*pref
+d_Fv = np.vectorize(d_F)
 
 def d_v(r): #velocity
-    return np.sqrt(-r*Fv(r))
+    return np.sqrt(-r*d_Fv(r))
