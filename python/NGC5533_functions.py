@@ -170,11 +170,12 @@ def b_vsquare(r,n=n_c):
     h = lambda m,r,n: C(n)*b_innerintegral(m,n)*(m**2)/(np.sqrt((r**2)-((m**2)*(e2)))) #integrate outer function
     return si.quad(h, 0, r, args=(r,n))[0]
 def b_vsquarev(r,n=n_c):
-    return np.vectorize(b_vsquare, otypes=[np.float])
+    a = np.vectorize(b_vsquare, otypes=[np.float])
+    return a(r,n)
 
 def b_v(r,n=n_c,save=False,load=False,**kwargs):
     if save:
-        a = b_vsquare(r,n)**(1/2)
+        a = b_vsquarev(r,n)**(1/2)
         savedata(a,'n'+str(n),'bulge',file='r'+str(r[0])+'-'+str(r[len(r)-1])+'_'+str(len(r)),**kwargs)
         return a
     elif load:
@@ -199,7 +200,7 @@ def h_vcasertano(r,z,rc=h_rc,rho00=h_rho00,gamma=h_gamma):                      
 def h_vjimenez(r,rc=h_rc,rho00=h_rho00):
     return np.sqrt(4*np.pi*G*rho00*(rc**2)*(1-((rc/r)*np.arctan(r/rc))))
 
-def h_v(r,save=False,load=False,**kwargs):
+def h_vNFW(r,save=True):
     rho = lambda r: rho_s/((r/rs)*((1+r/rs)**2))
     f = lambda R: 4*np.pi*rho(R)*(R**2)          #NFW Density Profile
     mdm = lambda r: si.quad(f, 0, r)[0]          #M(r)
@@ -214,6 +215,11 @@ def h_v(r,save=False,load=False,**kwargs):
     else:
         return np.sqrt(vdm2v(r))
 
+def h_viso(r,rc=h_rc,rho00=h_rho00):
+    return np.sqrt(4*np.pi*G*rho00*(rc**2)*(1-((rc/r)*np.arctan(r/rc))))
+h_v = h_viso
+        
+        
 ################################
 ############ Disk ##############
 ################################
