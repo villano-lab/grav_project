@@ -181,7 +181,8 @@ def b_v(r,n=n_c,save=False,load=False,**kwargs):
     elif load:
         return loaddata('n'+str(n),'bulge',file='r'+str(r[0])+'-'+str(r[len(r)-1])+'_'+str(len(r)),**kwargs)
     else:
-        return b_vsquare(r,n)**(1/2)
+        a = b_vsquarev(r,n)**(1/2)
+        return a(r,n)
 
 ################################
 ############ Halo ##############
