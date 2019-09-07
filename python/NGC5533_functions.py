@@ -6,6 +6,7 @@ import numpy as np
 import scipy.special as ss
 import scipy.optimize as so
 import scipy.integrate as si
+import scipy.interpolate as inter
 try:
     import h5py as h5
     h5py = 1
@@ -22,7 +23,7 @@ x = np.linspace(0,10,100) #Default radius array
 
 ################################
 ########## Constants ###########
-################################    
+################################
 
 #---------Definitely Constant---------
 G = 4.30091e-6    #gravitational constant (kpc/solar mass*(km/s)^2)
@@ -66,7 +67,7 @@ h_gamma = 0
 
 def savedata(xvalues,yvalues,group,dataset,path='./',file='Inputs.hdf5'):
     if h5py == 1:
-        saved = h5.File(path+file,'w')
+        saved = h5.File(path+file,'a')
         if group in ['Disk', 'disc', 'Disc', 'd', 'D']:
             group = 'disk'
             print("Group name set to 'disk'.")
@@ -116,14 +117,15 @@ def loaddata(group,dataset,path='./',file='Inputs.hdf5'):
         if group in ['t','T','Total']:
             group = 'total'
             print("Group name set to 'total'.")
-        try:
-            grp = saved[group]
-            dset = grp[dataset]
-        except KeyError:
-            print("No such group! Aborting.")
-            saved.close()
-            sys.exit
-        return dset[:]
+        #try:
+        grp = saved[group]
+        dset = grp[dataset]
+        #except KeyError:
+        #    print("No such group! Aborting.")
+        #    saved.close()
+        #    sys.exit
+        a = dset[:]
+        return a
         saved.close()
     #Placeholder; I will design this to store information at a later date.
     if h5py ==0:
@@ -134,7 +136,7 @@ def loaddata(group,dataset,path='./',file='Inputs.hdf5'):
 ######### Black Hole ###########
 ################################
 
-def bh_v(r=x,M=Mbh_def,save=False,load=False,**kwargs): #M in solar masses, r in kpc
+def bh_v(r,M=Mbh_def,save=False,load=False,**kwargs): #M in solar masses, r in kpc
     if save:
         a = np.sqrt(G*M/r)
         savedata(r,a,'blackhole','Mbh'+str(M),**kwargs)
@@ -142,8 +144,11 @@ def bh_v(r=x,M=Mbh_def,save=False,load=False,**kwargs): #M in solar masses, r in
     elif load:
         return loaddata('blackhole','Mbh'+str(M),**kwargs)
     else:
-        return np.sqrt(G*M/r)
-
+        a = np.sqrt(G*M/r)
+        if isinstance(a,list) or isinstance(a,np.ndarray):
+            a[np.isnan(a)] = 0
+        return a
+    
 ################################
 ########### Bulge ##############
 ################################
@@ -276,12 +281,13 @@ d_Fv = np.vectorize(d_F)
 def d_v(r,save=False,load=False,**kwargs): #velocity
     if save:
         a = np.sqrt(-r*d_Fv(r))
-        savedata(r,a,'disk','n'+str('PLACEHOLDER'),**kwargs)
+        a[np.isnan(a)] = 0
+        savedata(r,a,'disk','PLACEHOLDER',**kwargs)
         return a
     elif load:
-        y = loaddata('disk','n'+str('PLACEHOLDER'),**kwargs)
-        x = np.linspace(0,r[len(r)-1],len(r))
-        a = inter.InterpolateUnivariateSpline(x,y,k=3) #k is the order of the polynomial
+        y = loaddata('disk','PLACEHOLDER',**kwargs)[1]
+        x = loaddata('disk','PLACEHOLDER',**kwargs)[0]
+        a = inter.InterpolatedUnivariateSpline(x,y,k=3) #k is the order of the polynomial
         return a(r)
     else:
         return np.sqrt(-r*d_Fv(r))
