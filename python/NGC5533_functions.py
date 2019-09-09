@@ -40,22 +40,19 @@ ups = 2.8                         #mass-to-light ratio (from Rotation Curves of 
 q = 0.33                          #intrinsic axis ratio
 e2 = 1-(q**2)
 i = 45*(np.pi/180)                #inclination angle
-h = 8.9                           #radial scale-length (kpc)
-z0 = 0.2*h                        #half-thickness (kpc)
-R = 4*h                           #cut-off radius (kpc)
-d = 0.2*h                         #cut-off length upper limits (kpc)
 h_rc = 1.4                        #core radius (kpc)
-h_rho00 = 0.31e9                  #central surface density (solar mass/kpc^3)
+
 c = 1e-12                         #concentration parameter
 Mvir = 1e11*((c/(11.7))**(-40/3)) #virial mass (in solar mass) solved from eq(5)
 Mbh_def = 2.7e9                   #Black Hole mass
 
 #---------Definitely Variable---------
 n_c = 2.7
+h_c = 8.9                           #radial scale-length (kpc)
+rho00_c = 0.31e9                    #central surface density (solar mass/kpc^3)
 
 #---------Uncategorized-------------------
 re = 2.6                                                 #1kpc
-d_rho00 = 0.31e9                                         #prefactor that will cancel #central density
 epsdisk = 5.0                                            #from Noordermeer's paper
 rs = (1/c)*(((3*Mvir)/((4*np.pi*100*rhocrit)))**(1/3))   #scale radius (kpc)
 rho_s = (100/3)*((c**3)/(np.log(1+c)-(c/(1+c))))*rhocrit #characteristic density
@@ -196,14 +193,14 @@ def b_v(r,n=n_c,save=False,load=False,**kwargs):
 def h_rhat(r,z):               #r-hat from Casertano eq(9)
     return np.sqrt((r**2)+(z**2))
 
-def h_rho(r,rho00=h_rho00,rc=h_rc): #Isothermal Density Profile
+def h_rho(r,rho00=rho00_c,rc=h_rc): #Isothermal Density Profile
     return rho00*((1+((r/rc)**2))**(-1))
     
-def h_vcasertano(r,z,rc=h_rc,rho00=h_rho00,gamma=h_gamma):                       #Velocity
+def h_vcasertano(r,z,rc=h_rc,rho00=rho00_c,gamma=h_gamma):                       #Velocity
     v0h = lambda r,rho00,rc,z: np.sqrt(h_rho(r,rho00,rc)*4*np.pi*G*(h_rhat(r,z)**2)) #eq 9 casertano
     return v0h(r,rho00,rc,z)*((r/rc)**gamma)                                     #eq 10 casertano
 
-def h_vjimenez(r,rc=h_rc,rho00=h_rho00):
+def h_vjimenez(r,rc=h_rc,rho00=rho00_c):
     return np.sqrt(4*np.pi*G*rho00*(rc**2)*(1-((rc/r)*np.arctan(r/rc))))
 
 def h_vNFW(r,save=True):
@@ -221,7 +218,7 @@ def h_vNFW(r,save=True):
     else:
         return np.sqrt(vdm2v(r))
 
-def h_viso(r,rc=h_rc,rho00=h_rho00):
+def h_viso(r,rc=h_rc,rho00=rho00_c):
     return np.sqrt(4*np.pi*G*rho00*(rc**2)*(1-((rc/r)*np.arctan(r/rc))))
 h_v = h_viso
         
@@ -230,67 +227,74 @@ h_v = h_viso
 ############ Disk ##############
 ################################
 
+#----- To Fit For --------
+#h, rho00
+
+#----- Multiples of h ----
+z0 = lambda h: 0.2*h                        #half-thickness (kpc)
+R = lambda h: 4*h                           #cut-off radius (kpc)
+d = lambda h: 0.2*h                         #cut-off length upper limits (kpc)
+
+#----- Functions ---------
+
 def d_px(r,u,xi):       #Initial Function
     x = lambda r,u,xi: ((r**2)+(u**2)+(xi**2))/(2*r*u)
     return x(r,u,xi)-(np.sqrt((x(r,u,xi)**2)-1))
 
-def d_rho0(r, R, h, d): #density piecewise function
-    condlist = [r <= R, (r > R) & (r <= (R+d)), r > (R+d)]
-    funclist = [lambda r: d_rho00*np.exp(-r/h), lambda r: d_rho00*np.exp(-R/h)*(1-((r-R)/d)), lambda r: 0]
-    return np.piecewise(r, condlist, funclist)
+def d_rho0(r, h, d_rho00=rho00_c): #density piecewise function
+    condlist = [r <= R(h), (r > R(h)) & (r <= (R(h)+d(h))), r > (R(h)+d(h))]
+    funclist = [lambda r,h,d_rho00: rho00*np.exp(-r/h), lambda r,h,d_rho00: rho00*np.exp(-R/h)*(1-((r-R)/d)), lambda r,h,d_rho00: 0]
+    return np.piecewise(r, h, d_rho00, condlist, funclist)
 
-def d_durho0(r, R, h, d): #partial derivative of rho(u,xi)
-    condlist = [r <= R, (r > R) & (r <= (R+d)), r > (R+d)]
-    funclist = [lambda r: -(1/h)*d_rho00*np.exp(-r/h), lambda r: -(1/d)*d_rho00*np.exp(-R/h), lambda r: 0]
-    return np.piecewise(r, condlist, funclist)
+def d_durho0(r, h, d_rho00=rho00_c): #partial derivative of rho(u,xi)
+    condlist = [r <= R(h), (r > R(h)) & (r <= (R(h)+d(h))), r > (R(h)+d(h))]
+    funclist = [lambda r,h,d_rho00: -(1/h)*d_rho00*np.exp(-r/h), lambda r,h,d_rho00: -(1/d)*d_rho00*np.exp(-R/h), lambda r,h,d_rho00: 0]
+    return np.piecewise(r, h, d_rho00, condlist, funclist)
+    #Thinks that funclist is a float??
 
 #Disk Density Distribution
-def d_rho_rz(r,z):
-    return d_rho0(r, R, h, d)*(np.power((np.cosh(z/z0)), (-2)))
-def d_drho_rz(r,z):
-    return d_durho0(r, R, h, d)*(np.power(np.cosh(z/z0), -2))
+def d_rho_rz(r,z,h,d_rho00):
+    return d_rho0(r, h, d_rho00)*(np.power((np.cosh(z/z0)), (-2)))
+def d_drho_rz(r,z,h,d_rho00):
+    return d_durho0(r, h, d_rho00)*(np.power(np.cosh(z/z0), -2))
 
 #Disk Density Distribution (3D)
-def d_rho_rz3D(r, z):
-    return d_rho0(r, R, h, d)*(np.power(np.cosh(z/z0), (-2)))
-def d_drho_rz3D(r, z):
-    return d_durho0(r, R, h, d)*(np.power(np.cosh(z/z0), (-2)))
 
 def d_K(r,u,xi): #Complete Elliptic Integral
     return ss.ellipk(d_px(r,u,xi)) - ss.ellipe(d_px(r,u,xi))
 
-def d_innerfunc(z,r,u):  #Inner Function (3D)
-    return u*d_drho_rz(u, z)*(2*d_K(r,u,z))/(np.pi*np.sqrt(r*u*d_px(r,u,z)))
+def d_innerfunc(z,r,u,h,d_rho00):  #Inner Function (3D)
+    return u*d_drho_rz(u, z, h, d_rho00)*(2*d_K(r,u,z))/(np.pi*np.sqrt(r*u*d_px(r,u,z)))
 
-def d_innerintegral(u,r): #Integrate Function
-    return si.quad(d_innerfunc, 0, np.inf, args=(r,u,))[0]
+def d_innerintegral(u,r,h,d_rho00): #Integrate Function
+    return si.quad(d_innerfunc, 0, np.inf, args=(r,u,h,d_rho00))[0]
 
-def d_outerintegral(r): #Integrate Outer Function
-    return si.nquad(d_innerintegral, [[0.1, 125]], args=(r,),opts=[options,options])[0]
+def d_outerintegral(r,h,d_rho00): #Integrate Outer Function
+    return si.quad(d_innerintegral, 0, np.inf, args=(r,h,d_rho00))[0]
 
-def d_Mintrho(r):
-    rho_rz_r = lambda z,r: d_rho_rz(r,z)*r
-    return si.quad(rho_rz_r, -125, 125, args=(r,))[0]
-d_Mdblintrho = si.quad(d_Mintrho,0,125)[0]
+def d_Mdblintrho(r,h,d_rho00):
+    rho_rz_r = lambda z,r: d_rho_rz(r,z,h,d_rho00)*r
+    d_Mintrho = lambda r,h,d_rho00: si.quad(rho_rz_r, -125, 125, args=(r,h,d_rho00))[0]
+    return si.quad(d_Mintrho,0,np.inf)[0]
 
-def d_F(r): #multiplying by upsylon
-    pref = epsdisk*(L0/d_Mdblintrho)
-    return 4*np.pi*G*d_outerintegral(r)*pref
+def d_F(r,pref): #multiplying by upsylon
+    pref = lambda r: epsdisk*(L0/d_Mdblintrho(r,h=h_c,d_rho00=rho00_c))
+    return 4*np.pi*G*d_outerintegral(r,h=h_c,d_rho00=rho00_c)*pref(r,h=h_c,d_rho00=rho00_c)
 d_Fv = np.vectorize(d_F)
 
-def d_v(r,save=False,load=False,**kwargs): #velocity
+def d_v(r,pref,save=False,load=False,**kwargs): #velocity
     if save:
-        a = np.sqrt(-r*d_Fv(r))
+        a = np.sqrt(-r*d_Fv(r,pref))
         a[np.isnan(a)] = 0
-        savedata(r,a,'disk','PLACEHOLDER',**kwargs)
+        savedata(r,a,'disk','pref'+str(pref),**kwargs)
         return a
     elif load:
-        y = loaddata('disk','PLACEHOLDER',**kwargs)[1]
-        x = loaddata('disk','PLACEHOLDER',**kwargs)[0]
+        y = loaddata('disk','pref'+str(pref),**kwargs)[1]
+        x = loaddata('disk','pref'+str(pref),**kwargs)[0]
         a = inter.InterpolatedUnivariateSpline(x,y,k=3) #k is the order of the polynomial
         return a(r)
     else:
-        return np.sqrt(-r*d_Fv(r))
+        return np.sqrt(-r*d_Fv(r,pref))
 
 ################################
 ############ Total #############
