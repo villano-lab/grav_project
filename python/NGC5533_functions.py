@@ -52,7 +52,7 @@ h_c = 8.9                           #radial scale-length (kpc)
 rho00_c = 0.31e9                    #central surface density (solar mass/kpc^3)
 
 #---------Uncategorized-------------------
-re = 2.6                                                 #1kpc
+re = 9.9                                                 #1kpc
 epsdisk = 5.0                                            #from Noordermeer's paper
 rs = (1/c)*(((3*Mvir)/((4*np.pi*100*rhocrit)))**(1/3))   #scale radius (kpc)
 rho_s = (100/3)*((c**3)/(np.log(1+c)-(c/(1+c))))*rhocrit #characteristic density
