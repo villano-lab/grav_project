@@ -187,7 +187,7 @@ def b_v(r,n=n_c,save=False,load=False,**kwargs):
         return loaddata('bulge','n'+str(n),**kwargs)
     else:
         a = b_vsquarev(r,n)**(1/2)
-        return a(r,n)
+        return a
 
 ################################
 ############ Halo ##############
