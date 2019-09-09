@@ -170,7 +170,7 @@ def b_vsquare(r,n=n_c):
     h = lambda m,r,n: C(n)*b_innerintegral(m,n)*(m**2)/(np.sqrt((r**2)-((m**2)*(e2)))) #integrate outer function
     return si.quad(h, 0, r, args=(r,n))[0]
 def b_vsquarev(r,n=n_c):
-    a = np.vectorize(b_vsquare, otypes=[np.float])
+    a = np.vectorize(b_vsquare)
     return a(r,n)
 
 def b_v(r,n=n_c,save=False,load=False,**kwargs):
