@@ -296,9 +296,9 @@ def d_F(r,pref=1,L=L0): #multiplying by upsylon
 d_Fv = np.vectorize(d_F)
 
 def d_v(r,pref=1,L=L0,save=False,load=False,*args,**kwargs): #velocity
-    a = np.sqrt(-r*d_Fv(r,pref))
-    a[np.isnan(a)] = 0
     if save:
+        a = np.sqrt(-r*d_Fv(r,pref))
+        a[np.isnan(a)] = 0
         savedata(r,a,'disk','pref'+str(pref),*args,**kwargs)
         return a
     elif load:
@@ -307,6 +307,8 @@ def d_v(r,pref=1,L=L0,save=False,load=False,*args,**kwargs): #velocity
         a = inter.InterpolatedUnivariateSpline(x,y,k=3) #k is the order of the polynomial
         return a(r)
     else:
+        a = np.sqrt(-r*d_Fv(r,pref))
+        a[np.isnan(a)] = 0
         return a
 
 ################################
