@@ -84,8 +84,8 @@ def savedata(xvalues,yvalues,group,dataset,path='./',file='Inputs.hdf5'):
             grp = saved.create_group(group)
             grp.create_dataset(dataset,data=[xvalues,yvalues])
         except:
-            grp = saved[group]
             try:
+                grp = saved[group]
                 grp.create_dataset(dataset,data=[xvalues,yvalues])
             except RuntimeError:
                 return loaddata(dataset,group,path,file)
@@ -257,72 +257,71 @@ def d_px(r,u,xi):       #Initial Function
     x = lambda r,u,xi: ((r**2)+(u**2)+(xi**2))/(2*r*u)
     return x(r,u,xi)-(np.sqrt((x(r,u,xi)**2)-1))
 
-def d_rho0(r, h, d_rho00=rho00_c): #density piecewise function
+def d_rho0(r, h=h_c, d_rho00=rho00_c): #density piecewise function
     conditions = [r <= R(h), (r > R(h)) & (r <= (R(h)+d(h))), r > (R(h)+d(h))]
     functions = [lambda r,h,d_rho00: d_rho00*np.exp(-r/h), lambda r,h,d_rho00: d_rho00*np.exp(-R(h)/h)*(1-((r-R(h))/d(h))), lambda r,h,d_rho00: 0]
     return np.piecewise(r, conditions, functions, h, d_rho00)
 
-def d_durho0(r, h, d_rho00=rho00_c): #partial derivative of rho(u,xi)
+def d_durho0(r, h=h_c, d_rho00=rho00_c): #partial derivative of rho(u,xi)
     conditions = [r <= R(h), (r > R(h)) & (r <= (R(h)+d(h))), r > (R(h)+d(h))]
     functions = [lambda r,h,d_rho00: -(1/h)*d_rho00*np.exp(-r/h), lambda r,h,d_rho00: -(1/d(h))*d_rho00*np.exp(-R(h)/h), lambda r,h,d_rho00: 0]
-    return np.piecewise(r, conditions, functions, h,d_rho00)
+    return np.piecewise(r, conditions, functions, h, d_rho00)
 
 #Disk Density Distribution
-def d_rho_rz(r,z,h,d_rho00):
+def d_rho_rz(r,z,h=h_c,d_rho00=rho00_c):
     return d_rho0(r, h, d_rho00)*np.power(np.cosh(z/z0(h)), -2)
-def d_drho_rz(r,z,h,d_rho00):
+def d_drho_rz(r,z,h=h_c,d_rho00=rho00_c):
     return d_durho0(r, h, d_rho00)*np.power(np.cosh(z/z0(h)), -2)
 
 def d_K(r,u,xi): #Complete Elliptic Integral
     return ss.ellipk(d_px(r,u,xi)) - ss.ellipe(d_px(r,u,xi))
 
-def d_innerfunc(z,r,u,h,d_rho00):  #Inner Function (3D)
+def d_innerfunc(z,r,u,h=h_c,d_rho00=rho00_c):  #Inner Function (3D)
     return u*d_drho_rz(u, z, h, d_rho00)*(2*d_K(r,u,z))/(np.pi*np.sqrt(r*u*d_px(r,u,z)))
 
-def d_innerintegral(u,r,h,d_rho00): #Integrate Function
-    return si.quad(d_innerfunc, 0, np.inf, args=(r,u,h,d_rho00))[0]
+def d_innerintegral(u,r,h=h_c,d_rho00=rho00_c): #Integrate Function
+    return si.quad(d_innerfunc, 0.01, np.inf, args=(u,r,h,d_rho00))[0]
 
-def d_outerintegral(r,h,d_rho00): #Integrate Outer Function
-    return si.quad(d_innerintegral, 0, np.inf, args=(r,h,d_rho00))[0]
+def d_outerintegral(r,h=h_c,d_rho00=rho00_c): #Integrate Outer Function
+    return si.quad(d_innerintegral, 0.01, np.inf, args=(r,h,d_rho00))[0]
 
-def d_Mdblintrho(r,h,d_rho00):
+def d_Mdblintrho(r,h=h_c,d_rho00=rho00_c):
     rho_rz_r = lambda z,r,h,d_rho00: d_rho_rz(r,z,h,d_rho00)*r
-    d_Mintrho = lambda r,h,d_rho00: si.quad(rho_rz_r, -125, 125, args=(r,h,d_rho00))[0]
-    return si.quad(d_Mintrho,0,np.inf,args=(h,d_rho00))[0]
+    d_Mintrho = lambda r,h,d_rho00: si.quad(rho_rz_r, -np.inf, -0.01, args=(r,h,d_rho00))[0] + si.quad(rho_rz_r, 0.01, np.inf, args=(r,h,d_rho00))[0]
+    return si.quad(d_Mintrho,-np.inf,np.inf,args=(h,d_rho00))[0]
 
-def d_F(r,pref=1,L=L0): #multiplying by upsylon
-    pref = lambda r,h,d_rho00: epsdisk*(L/d_Mdblintrho(r,h=h_c,d_rho00=rho00_c))
-    return 4*np.pi*G*d_outerintegral(r,h=h_c,d_rho00=rho00_c)*pref(r,h=h_c,d_rho00=rho00_c)
+def d_F(r,pref=1): #multiplying by upsylon
+    #pref = lambda r,h,d_rho00: epsdisk*(L/d_Mdblintrho(r,h,d_rho00))
+    #pref = epsdisk*(L/d_Mdblintrho(r,h,d_rho00))
+    return 4*np.pi*G*d_outerintegral(r,h_c,rho00_c)*pref
 d_Fv = np.vectorize(d_F)
 
-def d_v(r,pref=1,L=L0,save=False,load=False,*args,**kwargs): #velocity
+def d_v(r,pref=1,save=False,load=False,*args,**kwargs): #velocity
     if save:
         a = np.sqrt(-r*d_Fv(r,pref))
-        a[np.isnan(a)] = 0
         savedata(r,a,'disk','pref'+str(pref),*args,**kwargs)
         return a
     elif load:
-        y = loaddata('disk','pref'+str(pref)+'L'+str(L),*args,**kwargs)[1]
-        x = loaddata('disk','pref'+str(pref)+'L'+str(L),*args,**kwargs)[0]
+        y = loaddata('disk','pref'+str(pref),*args,**kwargs)[1]
+        x = loaddata('disk','pref'+str(pref),*args,**kwargs)[0]
         a = inter.InterpolatedUnivariateSpline(x,y,k=3) #k is the order of the polynomial
         return a(r)
     else:
         a = np.sqrt(-r*d_Fv(r,pref))
-        a[np.isnan(a)] = 0
         return a
 
 ################################
 ############ Total #############
 ################################
-def v(r,M=Mbh_def,n=n_c,pref=1,L=L0,rc=h_rc,rho00=rho00_c,*args,**kwargs): 
+def v(r,M=Mbh_def,n=n_c,pref=1,rc=h_rc,rho00=rho00_c,*args,**kwargs): 
     a = np.sqrt(np.sqrt(h_v(r,rc,rho00)**2+d_v(r,pref,L)**2+bh_v(r,M)**2+b_v(r,n)**2))
     a[np.isnan(a)] = 0
     if save:
-        savedata(r,a,'total','Mbh'+str(M)+'n'+str(n)+'n'+str(pref)+'L'+str(L0)+'rc'+str(rc)+'rho00'+str(rho00),*args,**kwargs)
+        savedata(r,a,'total','Mbh'+str(M)+'n'+str(n)+'n'+str(pref)+'rc'+str(rc)+'rho00'+str(rho00),*args,**kwargs)
         return a
     elif load:
-        y = loaddata('total','Mbh'+str(M)+'n'+str(n)+'n'+str(pref)+'L'+str(L0)+'rc'+str(rc)+'rho00'+str(rho00),*args,**kwargs)[1]
-        x = loaddata('total','Mbh'+str(M)+'n'+str(n)+'n'+str(pref)+'L'+str(L0)+'rc'+str(rc)+'rho00'+str(rho00),*args,**kwargs)[0]
+        y = loaddata('total','Mbh'+str(M)+'n'+str(n)+'n'+str(pref)+'rc'+str(rc)+'rho00'+str(rho00),*args,**kwargs)[1]
+        x = loaddata('total','Mbh'+str(M)+'n'+str(n)+'n'+str(pref)+'rc'+str(rc)+'rho00'+str(rho00),*args,**kwargs)[0]
         a = inter.InterpolatedUnivariateSpline(x,y,k=3)
         return a(r)
     else:
