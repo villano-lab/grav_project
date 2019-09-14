@@ -281,6 +281,7 @@ def d_innerfunc(z,r,u,h=h_c,d_rho00=rho00_c):  #Inner Function (3D)
 
 def d_innerintegral(u,r,h=h_c,d_rho00=rho00_c): #Integrate Function
     return si.quad(d_innerfunc, 0.01, np.inf, args=(u,r,h,d_rho00))[0]
+#Args passed into quad need to be numbers, not arrays. (?)
 
 def d_outerintegral(r,h=h_c,d_rho00=rho00_c): #Integrate Outer Function
     return si.quad(d_innerintegral, 0.01, np.inf, args=(r,h,d_rho00))[0]
@@ -291,8 +292,6 @@ def d_Mdblintrho(r,h=h_c,d_rho00=rho00_c):
     return si.quad(d_Mintrho,-np.inf,np.inf,args=(h,d_rho00))[0]
 
 def d_F(r,pref=1): #multiplying by upsylon
-    #pref = lambda r,h,d_rho00: epsdisk*(L/d_Mdblintrho(r,h,d_rho00))
-    #pref = epsdisk*(L/d_Mdblintrho(r,h,d_rho00))
     return 4*np.pi*G*d_outerintegral(r,h_c,rho00_c)*pref
 d_Fv = np.vectorize(d_F)
 
