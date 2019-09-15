@@ -254,11 +254,11 @@ d = lambda h: 0.2*h                         #cut-off length upper limits (kpc)
 #----- Functions ---------
 
 def d_px(r,u,xi):       #Initial Function
-    x = lambda r,u,xi: ((r**2)+(u**2)+(xi**2))/(2*r*u)
-    return x(r,u,xi)-(np.sqrt((x(r,u,xi)**2)-1))
+    x = lambda r,u,xi: (r**2+u**2+xi**2)/(2*r*u)
+    return x(r,u,xi)-(np.sqrt(x(r,u,xi)**2-1))
 
 def d_rho0(r, h=h_c, d_rho00=rho00_c): #density piecewise function
-    conditions = [r <= R(h), (r > R(h)) & (r <= (R(h)+d(h))), r > (R(h)+d(h))]
+    conditions = [r <= R(h), r > R(h) & r <= R(h)+d(h), r > R(h)+d(h)]
     functions = [lambda r,h,d_rho00: d_rho00*np.exp(-r/h), lambda r,h,d_rho00: d_rho00*np.exp(-R(h)/h)*(1-((r-R(h))/d(h))), lambda r,h,d_rho00: 0]
     return np.piecewise(r, conditions, functions, h, d_rho00)
 
