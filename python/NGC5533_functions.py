@@ -278,10 +278,10 @@ def d_drho_rz(r,z,h=h_c,d_rho00=rho00_c):
     return d_durho0(r, h, d_rho00)*np.power(np.cosh(z/z0(h)), -2)
 
 def d_K(r,u,xi): #Complete Elliptic Integral
-    return ss.ellipk(d_px(r,u,xi)) - ss.ellipe(d_px(r,u,xi))
+    return 2*(ss.ellipk(d_px(r,u,xi)) - ss.ellipe(d_px(r,u,xi)))/(np.pi*np.sqrt(r*u*d_px(r,u,xi)))
 
 def d_innerfunc(z,r,u,h=h_c,d_rho00=rho00_c):  #Inner Function (3D)
-    return u*d_drho_rz(u, z, h, d_rho00)*(2*d_K(r,u,z))/(np.pi*np.sqrt(r*u*d_px(r,u,z)))
+    return d_drho_rz(u, z, h, d_rho00)*d_K(r,u,z)
 
 def d_innerintegral(u,r,h=h_c,d_rho00=rho00_c): #Integrate Function
     return u*si.quad(d_innerfunc, 0.01, np.inf, args=(u,r,h,d_rho00))[0]
