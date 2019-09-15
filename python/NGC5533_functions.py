@@ -258,14 +258,17 @@ def d_px(r,u,xi):       #Initial Function
     return x(r,u,xi)-(np.sqrt(x(r,u,xi)**2-1))
 
 def d_rho0(r, h=h_c, d_rho00=rho00_c): #density piecewise function
-    conditions = [r <= R(h), r > R(h) & r <= R(h)+d(h), r > R(h)+d(h)]
+    conditions = [r <= R(h),
+                  r > R(h) & r <= R(h)+d(h), r > R(h)+d(h)]
     functions = [lambda r,h,d_rho00: d_rho00*np.exp(-r/h),
                  lambda r,h,d_rho00: d_rho00*np.exp(-R(h)/h)*(1-((r-R(h))/d(h))),
                  lambda r,h,d_rho00: 0]
     return np.piecewise(r, conditions, functions, h, d_rho00)
 
 def d_durho0(r, h=h_c, d_rho00=rho00_c): #partial derivative of rho(u,xi)
-    conditions = [r <= R(h), (r > R(h)) & (r <= (R(h)+d(h))), r > (R(h)+d(h))]
+    conditions = [r <= R(h),
+                  (r > R(h)) & (r <= (R(h)+d(h))),
+                  r > (R(h)+d(h))]
     functions = [lambda r,h,d_rho00: -(1/h)*d_rho00*np.exp(-r/h),
                  lambda r,h,d_rho00: -(1/d(h))*d_rho00*np.exp(-R(h)/h),
                  lambda r,h,d_rho00: 0]
@@ -284,16 +287,16 @@ def d_innerfunc(z,r,u,h=h_c,d_rho00=rho00_c):  #Inner Function (3D)
     return d_drho_rz(u, z, h, d_rho00)*d_K(r,u,z)
 
 def d_innerintegral(u,r,h=h_c,d_rho00=rho00_c): #Integrate Function
-    return u*si.quad(d_innerfunc, 1, np.inf, args=(u,r,h,d_rho00))[0]
+    return u*si.quad(d_innerfunc, 1, 125, args=(u,r,h,d_rho00))[0]
 #Args passed into quad need to be numbers, not arrays. (?)
 
 def d_outerintegral(r,h=h_c,d_rho00=rho00_c): #Integrate Outer Function
-    return si.quad(d_innerintegral, 1, np.inf, args=(r,h,d_rho00))[0]
+    return si.quad(d_innerintegral, 1, 125, args=(r,h,d_rho00))[0]
 
 def d_Mdblintrho(r,h=h_c,d_rho00=rho00_c):
     rho_rz_r = lambda z,r,h,d_rho00: d_rho_rz(r,z,h,d_rho00)*r
-    d_Mintrho = lambda r,h,d_rho00: si.quad(rho_rz_r, -np.inf, -1, args=(r,h,d_rho00))[0] + si.quad(rho_rz_r, 1, np.inf, args=(r,h,d_rho00))[0]
-    return si.quad(d_Mintrho,-np.inf,np.inf,args=(h,d_rho00))[0]
+    d_Mintrho = lambda r,h,d_rho00: si.quad(rho_rz_r, -125, -1, args=(r,h,d_rho00))[0] + si.quad(rho_rz_r, 1, 125, args=(r,h,d_rho00))[0]
+    return si.quad(d_Mintrho,-125,125,args=(h,d_rho00))[0]
 
 def d_F(r,pref=1): #multiplying by upsylon
     return 4*np.pi*G*d_outerintegral(r,h_c,rho00_c)*pref
