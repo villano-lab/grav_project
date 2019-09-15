@@ -259,12 +259,16 @@ def d_px(r,u,xi):       #Initial Function
 
 def d_rho0(r, h=h_c, d_rho00=rho00_c): #density piecewise function
     conditions = [r <= R(h), r > R(h) & r <= R(h)+d(h), r > R(h)+d(h)]
-    functions = [lambda r,h,d_rho00: d_rho00*np.exp(-r/h), lambda r,h,d_rho00: d_rho00*np.exp(-R(h)/h)*(1-((r-R(h))/d(h))), lambda r,h,d_rho00: 0]
+    functions = [lambda r,h,d_rho00: d_rho00*np.exp(-r/h),
+                 lambda r,h,d_rho00: d_rho00*np.exp(-R(h)/h)*(1-((r-R(h))/d(h))),
+                 lambda r,h,d_rho00: 0]
     return np.piecewise(r, conditions, functions, h, d_rho00)
 
 def d_durho0(r, h=h_c, d_rho00=rho00_c): #partial derivative of rho(u,xi)
     conditions = [r <= R(h), (r > R(h)) & (r <= (R(h)+d(h))), r > (R(h)+d(h))]
-    functions = [lambda r,h,d_rho00: -(1/h)*d_rho00*np.exp(-r/h), lambda r,h,d_rho00: -(1/d(h))*d_rho00*np.exp(-R(h)/h), lambda r,h,d_rho00: 0]
+    functions = [lambda r,h,d_rho00: -(1/h)*d_rho00*np.exp(-r/h),
+                 lambda r,h,d_rho00: -(1/d(h))*d_rho00*np.exp(-R(h)/h),
+                 lambda r,h,d_rho00: 0]
     return np.piecewise(r, conditions, functions, h, d_rho00)
 
 #Disk Density Distribution
@@ -280,7 +284,7 @@ def d_innerfunc(z,r,u,h=h_c,d_rho00=rho00_c):  #Inner Function (3D)
     return u*d_drho_rz(u, z, h, d_rho00)*(2*d_K(r,u,z))/(np.pi*np.sqrt(r*u*d_px(r,u,z)))
 
 def d_innerintegral(u,r,h=h_c,d_rho00=rho00_c): #Integrate Function
-    return si.quad(d_innerfunc, 0.01, np.inf, args=(u,r,h,d_rho00))[0]
+    return u*si.quad(d_innerfunc, 0.01, np.inf, args=(u,r,h,d_rho00))[0]
 #Args passed into quad need to be numbers, not arrays. (?)
 
 def d_outerintegral(r,h=h_c,d_rho00=rho00_c): #Integrate Outer Function
