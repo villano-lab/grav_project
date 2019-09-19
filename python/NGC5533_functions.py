@@ -19,7 +19,6 @@ except ModuleNotFoundError:
 ################################    
 
 options={'limit':100}     #Sets maximum subdivisions to 100 for integration instead of 50
-x = np.linspace(0,10,100) #Default radius array
 
 ################################
 ########## Constants ###########
@@ -41,7 +40,6 @@ q = 0.33                          #intrinsic axis ratio
 e2 = 1-(q**2)
 i = 45*(np.pi/180)                #inclination angle
 h_rc = 1.4                        #core radius (kpc)
-
 c = 1e-12                         #concentration parameter
 Mvir = 1e11*((c/(11.7))**(-40/3)) #virial mass (in solar mass) solved from eq(5)
 Mbh_def = 2.7e9                   #Black Hole mass
@@ -88,8 +86,8 @@ def savedata(xvalues,yvalues,group,dataset,path='./',file='Inputs.hdf5'):
                 grp = saved[group]
                 grp.create_dataset(dataset,data=[xvalues,yvalues])
             except RuntimeError:
-                return loaddata(dataset,group,path,file)
-                print("Already exists! Loaded data.")
+                print("Already exists! Loading data.")
+                return loaddata(group,dataset,path,file)
         saved.close()
         print("Saved.")
     if h5py == 0:
