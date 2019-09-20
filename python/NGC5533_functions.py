@@ -63,7 +63,7 @@ h_gamma = 0
 def savedata(xvalues,yvalues,group,dataset,path='./',file='Inputs.hdf5'):
     if h5py == 1:
         saved = h5.File(path+file,'a')
-        if group in ['Disk', 'disc', 'Disc', 'd', 'D']:
+        if group in ['Disk', 'disc', 'Disc',  'd', 'D']:
             group = 'disk'
             print("Group name set to 'disk'.")
         if group in ['bh','Bh','BH','Black Hole','BlackHole','Blackhole,','Black hole','black hole','Black Hole']:
@@ -86,8 +86,21 @@ def savedata(xvalues,yvalues,group,dataset,path='./',file='Inputs.hdf5'):
                 grp = saved[group]
                 grp.create_dataset(dataset,data=[xvalues,yvalues])
             except RuntimeError:
-                print("Already exists! Loading data.")
-                return loaddata(group,dataset,path,file)
+                x = loaddata(group,dataset,path,file)[0]
+                x = np.append(x,xvalues)
+                y = loaddata(group,dataset,path,file)[1]
+                y = np.append(y,yvalues)
+                x, y = (list(a) for a in zip(*sorted(zip(x, y))))
+                i = 0
+                while i < len(x)-1:
+                    if x[i+1] == x[i]:
+                        x = np.delete(x,i+1)
+                        y = np.delete(y,i+1)
+                    else:
+                        i += 1
+                del grp[dataset]
+                savedata(x,y,group,dataset,path,file)
+                return y
         saved.close()
         print("Saved.")
     if h5py == 0:
