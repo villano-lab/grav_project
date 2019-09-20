@@ -144,15 +144,20 @@ def loaddata(group,dataset,path='./',file='Inputs.hdf5'):
 ######### Black Hole ###########
 ################################
 
-def bh_v(r,M=Mbh_def,save=False,load=False,*args,**kwargs): #M in solar masses, r in kpc
+def bh_v(r,M=Mbh_def,save=False,load=False,**kwargs): #M in solar masses, r in kpc
     a = np.sqrt(G*M/r)
     if save:
-        savedata(r,a,'blackhole','Mbh'+str(M),*args,**kwargs)
+        savedata(r,a,'blackhole','Mbh'+str(M),**kwargs)
         return a
     elif load:
-        y = loaddata('blackhole','Mbh'+str(M),*args,**kwargs)[1]
-        x = loaddata('blackhole','Mbh'+str(M),*args,**kwargs)[0]
+        try: #Load existing prefactor if available
+            y = loaddata('blackhole','Mbh'+str(M),**kwargs)[1]
+            x = loaddata('blackhole','Mbh'+str(M),**kwargs)[0]
+        except: #If unable to load, load default instead and apply a prefactor retroactively
+            y = M*loaddata('bh','Mbh1',**kwargs)[1]
+            x = loaddata('bh','Mbh1',**kwargs)[0]
         a = inter.InterpolatedUnivariateSpline(x,y,k=3) #k is the order of the polynomial
+        return a(r)
         return loaddata('blackhole','Mbh'+str(M),**kwargs)
     else:
         return a
@@ -186,15 +191,15 @@ def b_vsquarev(r,n=n_c):
     a = np.vectorize(b_vsquare)
     return a(r,n)
 
-def b_v(r,n=n_c,save=False,load=False,*args,**kwargs):
+def b_v(r,n=n_c,save=False,load=False,**kwargs):
     a = b_vsquarev(r,n)**(1/2)
     a[np.isnan(a)] = 0
     if save:
-        savedata(r,a,'bulge','n'+str(n),*args,**kwargs)
+        savedata(r,a,'bulge','n'+str(n),**kwargs)
         return a
     elif load:
-        y = loaddata('bulge','n'+str(n),*args,**kwargs)[1]
-        x = loaddata('bulge','n'+str(n),*args,**kwargs)[0]
+        y = loaddata('bulge','n'+str(n),**kwargs)[1]
+        x = loaddata('bulge','n'+str(n),**kwargs)[0]
         a = inter.InterpolatedUnivariateSpline(x,y,k=3) #k is the order of the polynomial
         return a(r)
     else:
@@ -217,7 +222,7 @@ def h_vcasertano(r,z,rc=h_rc,rho00=rho00_c,gamma=h_gamma):                      
 def h_vjimenez(r,rc=h_rc,rho00=rho00_c):
     return np.sqrt(4*np.pi*G*rho00*(rc**2)*(1-((rc/r)*np.arctan(r/rc))))
 
-def h_vNFW(r,save=True):
+def h_vNFW(r,save=True,**kwargs):
     rho = lambda r: rho_s/((r/rs)*((1+r/rs)**2))
     f = lambda R: 4*np.pi*rho(R)*(R**2)          #NFW Density Profile
     mdm = lambda r: si.quad(f, 0, r)[0]          #M(r)
@@ -233,15 +238,15 @@ def h_vNFW(r,save=True):
     else:
         return a(r)
 
-def h_viso(r,rc=h_rc,rho00=rho00_c,load=False,save=False,*args,**kwargs):
+def h_viso(r,rc=h_rc,rho00=rho00_c,load=False,save=False,**kwargs):
     a = np.sqrt(4*np.pi*G*rho00*(rc**2)*(1-((rc/r)*np.arctan(r/rc))))
     a[np.isnan(a)] = 0
     if save:
-        savedata(r,a,'halo','rc'+str(rc)+'rho00'+str(rho00),*args,**kwargs)
+        savedata(r,a,'halo','rc'+str(rc)+'rho00'+str(rho00),**kwargs)
         return a
     elif load:
-        y = loaddata('halo','rc'+str(rc)+'rho00'+str(rho00),*args,**kwargs)[1]
-        x = loaddata('halo','rc'+str(rc)+'rho00'+str(rho00),*args,**kwargs)[0]
+        y = loaddata('halo','rc'+str(rc)+'rho00'+str(rho00),**kwargs)[1]
+        x = loaddata('halo','rc'+str(rc)+'rho00'+str(rho00),**kwargs)[0]
         a = inter.InterpolatedUnivariateSpline(x,y,k=3) #k is the order of the polynomial
         return a(r)
     else:
@@ -270,7 +275,8 @@ def d_px(r,u,xi):       #Initial Function
 
 def d_rho0(r, h=h_c, d_rho00=rho00_c): #density piecewise function
     conditions = [r <= R(h),
-                  r > R(h) & r <= R(h)+d(h), r > R(h)+d(h)]
+                  (r > R(h)) & (r <= R(h)+d(h)), 
+                  r > R(h)+d(h)]
     functions = [lambda r,h,d_rho00: d_rho00*np.exp(-r/h),
                  lambda r,h,d_rho00: d_rho00*np.exp(-R(h)/h)*(1-((r-R(h))/d(h))),
                  lambda r,h,d_rho00: 0]
@@ -304,7 +310,7 @@ def d_innerintegral(u,r,h=h_c,d_rho00=rho00_c): #Integrate Function
 def d_outerintegral(r,h=h_c,d_rho00=rho00_c): #Integrate Outer Function
     return si.quad(d_innerintegral, 1, 125, args=(r,h,d_rho00))[0]
 
-def d_Mdblintrho(r,h=h_c,d_rho00=rho00_c):
+def d_Mdblintrho(r,h=h_c,d_rho00=rho00_c):    #M double-integral rho
     rho_rz_r = lambda z,r,h,d_rho00: d_rho_rz(r,z,h,d_rho00)*r
     d_Mintrho = lambda r,h,d_rho00: si.quad(rho_rz_r, -125, -1, args=(r,h,d_rho00))[0] + si.quad(rho_rz_r, 1, 125, args=(r,h,d_rho00))[0]
     return si.quad(d_Mintrho,-125,125,args=(h,d_rho00))[0]
@@ -313,14 +319,18 @@ def d_F(r,pref=1): #multiplying by upsylon
     return 4*np.pi*G*d_outerintegral(r,h_c,rho00_c)*pref
 d_Fv = np.vectorize(d_F)
 
-def d_v(r,pref=1,save=False,load=False,*args,**kwargs): #velocity
+def d_v(r,pref=1,save=False,load=False,**kwargs): #velocity
     if save:
         a = np.sqrt(-r*d_Fv(r,pref))
-        savedata(r,a,'disk','pref'+str(pref),*args,**kwargs)
+        savedata(r,a,'disk','pref'+str(pref),**kwargs)
         return a
     elif load:
-        y = loaddata('disk','pref'+str(pref),*args,**kwargs)[1]
-        x = loaddata('disk','pref'+str(pref),*args,**kwargs)[0]
+        try: #Load existing prefactor if available
+            y = loaddata('disk','pref'+str(pref),**kwargs)[1]
+            x = loaddata('disk','pref'+str(pref),**kwargs)[0]
+        except: #If unable to load, load 1 instead and apply a prefactor retroactively
+            y = pref*loaddata('disk','pref1',**kwargs)[1]
+            x = loaddata('disk','pref1',**kwargs)[0]
         a = inter.InterpolatedUnivariateSpline(x,y,k=3) #k is the order of the polynomial
         return a(r)
     else:
@@ -330,15 +340,15 @@ def d_v(r,pref=1,save=False,load=False,*args,**kwargs): #velocity
 ################################
 ############ Total #############
 ################################
-def v(r,M=Mbh_def,n=n_c,pref=1,rc=h_rc,rho00=rho00_c,*args,**kwargs): 
+def v(r,M=Mbh_def,n=n_c,pref=1,rc=h_rc,rho00=rho00_c,save=False,load=False,**kwargs): 
     a = np.sqrt(np.sqrt(h_v(r,rc,rho00)**2+d_v(r,pref,L)**2+bh_v(r,M)**2+b_v(r,n)**2))
     a[np.isnan(a)] = 0
     if save:
-        savedata(r,a,'total','Mbh'+str(M)+'n'+str(n)+'n'+str(pref)+'rc'+str(rc)+'rho00'+str(rho00),*args,**kwargs)
+        savedata(r,a,'total','Mbh'+str(M)+'n'+str(n)+'n'+str(pref)+'rc'+str(rc)+'rho00'+str(rho00),**kwargs)
         return a
     elif load:
-        y = loaddata('total','Mbh'+str(M)+'n'+str(n)+'n'+str(pref)+'rc'+str(rc)+'rho00'+str(rho00),*args,**kwargs)[1]
-        x = loaddata('total','Mbh'+str(M)+'n'+str(n)+'n'+str(pref)+'rc'+str(rc)+'rho00'+str(rho00),*args,**kwargs)[0]
+        y = loaddata('total','Mbh'+str(M)+'n'+str(n)+'n'+str(pref)+'rc'+str(rc)+'rho00'+str(rho00),**kwargs)[1]
+        x = loaddata('total','Mbh'+str(M)+'n'+str(n)+'n'+str(pref)+'rc'+str(rc)+'rho00'+str(rho00),**kwargs)[0]
         a = inter.InterpolatedUnivariateSpline(x,y,k=3)
         return a(r)
     else:
