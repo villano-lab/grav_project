@@ -26,7 +26,3 @@ before_script: cd NGC5533_Final
 
 script:
 - travis_wait 30 py.test
-
-after_script: 
-- cd ../python
-- python NGC5533_functions.py

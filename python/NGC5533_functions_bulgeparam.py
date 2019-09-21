@@ -48,9 +48,11 @@ Mbh_def = 2.7e9                   #Black Hole mass
 n_c = 2.7
 h_c = 8.9                           #radial scale-length (kpc)
 rho00_c = 0.31e9                    #central surface density (solar mass/kpc^3)
+re_c = 9.9                                                 #effective radius (kpc)
 
 #---------Uncategorized-------------------
-re_c = 9.9                                               #effective radius (kpc)
+#re = 9.9                                                 #effective radius (kpc)
+
 epsdisk = 5.0                                            #from Noordermeer's paper
 rs = (1/c)*(((3*Mvir)/((4*np.pi*100*rhocrit)))**(1/3))   #scale radius (kpc)
 rho_s = (100/3)*((c**3)/(np.log(1+c)-(c/(1+c))))*rhocrit #characteristic density
@@ -191,7 +193,7 @@ def b_vsquarev(r,n=n_c,re=re_c):
     a = np.vectorize(b_vsquare)
     return a(r,n,re)
 
-def b_v(r,n=n_c,re=re_c,save=False,load=False,**kwargs):
+def b_v(r,n=n_c,re=re_c,save=False,load=False,*args,**kwargs):
     a = b_vsquarev(r,n,re)**(1/2)
     a[np.isnan(a)] = 0
     if save:
