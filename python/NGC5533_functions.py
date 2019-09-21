@@ -125,13 +125,8 @@ def loaddata(group,dataset,path='./',file='Inputs.hdf5'):
         if group in ['t','T','Total']:
             group = 'total'
             print("Group name set to 'total'.")
-        #try:
         grp = saved[group]
         dset = grp[dataset]
-        #except KeyError:
-        #    print("No such group! Aborting.")
-        #    saved.close()
-        #    sys.exit
         a = dset[:]
         return a
         saved.close()
@@ -153,7 +148,7 @@ def bh_v(r,M=Mbh_def,save=False,load=False,**kwargs): #M in solar masses, r in k
         try: #Load existing prefactor if available
             y = loaddata('blackhole','Mbh'+str(M),**kwargs)[1]
             x = loaddata('blackhole','Mbh'+str(M),**kwargs)[0]
-        except: #If unable to load, load default instead and apply a prefactor retroactively
+        except KeyError: #If unable to load, load default instead and apply a prefactor retroactively
             y = M*loaddata('bh','Mbh1',**kwargs)[1]
             x = loaddata('bh','Mbh1',**kwargs)[0]
         a = inter.InterpolatedUnivariateSpline(x,y,k=3) #k is the order of the polynomial
@@ -194,14 +189,17 @@ def b_vsquarev(r,n=n_c,re=re_c):
 def b_v(r,n=n_c,re=re_c,save=False,load=False,**kwargs):
     a = b_vsquarev(r,n,re)**(1/2)
     a[np.isnan(a)] = 0
+    if load:
+        try: #load if exists
+            y = loaddata('bulge','n'+str(n)+'re'+str(re),**kwargs)[1]
+            x = loaddata('bulge','n'+str(n)+'re'+str(re),**kwargs)[0]
+            b = inter.InterpolatedUnivariateSpline(x,y,k=3) #k is the order of the polynomial
+            return b(r)
+        except KeyError: #if does not exist,
+            save = True  #go to save function instead
     if save:
         savedata(r,a,'bulge','n'+str(n)+'re'+str(re),**kwargs)
         return a
-    elif load:
-        y = loaddata('bulge','n'+str(n)+'re'+str(re),**kwargs)[1]
-        x = loaddata('bulge','n'+str(n)+'re'+str(re),**kwargs)[0]
-        a = inter.InterpolatedUnivariateSpline(x,y,k=3) #k is the order of the polynomial
-        return a(r)
     else:
         return a
 
@@ -238,17 +236,20 @@ def h_vNFW(r,save=True,**kwargs):
     else:
         return a(r)
 
-def h_viso(r,rc=h_rc,rho00=rho00_c,load=False,save=False,**kwargs):
+def h_viso(r,rc=h_rc,rho00=rho00_c,load=False,save=False,**kwargs):   #h_v iso
     a = np.sqrt(4*np.pi*G*rho00*(rc**2)*(1-((rc/r)*np.arctan(r/rc))))
     a[np.isnan(a)] = 0
+    if load:
+        try: #Load if exists
+            y = loaddata('halo','rc'+str(rc)+'rho00'+str(rho00),**kwargs)[1]
+            x = loaddata('halo','rc'+str(rc)+'rho00'+str(rho00),**kwargs)[0]
+            b = inter.InterpolatedUnivariateSpline(x,y,k=3) #k is the order of the polynomial
+            return b(r)
+        except KeyError: #If does not exist,
+            save = True #Calculate and save
     if save:
         savedata(r,a,'halo','rc'+str(rc)+'rho00'+str(rho00),**kwargs)
         return a
-    elif load:
-        y = loaddata('halo','rc'+str(rc)+'rho00'+str(rho00),**kwargs)[1]
-        x = loaddata('halo','rc'+str(rc)+'rho00'+str(rho00),**kwargs)[0]
-        a = inter.InterpolatedUnivariateSpline(x,y,k=3) #k is the order of the polynomial
-        return a(r)
     else:
         return a
 
@@ -328,7 +329,7 @@ def d_v(r,pref=1,save=False,load=False,**kwargs): #velocity
         try: #Load existing prefactor if available
             y = loaddata('disk','pref'+str(pref),**kwargs)[1]
             x = loaddata('disk','pref'+str(pref),**kwargs)[0]
-        except: #If unable to load, load 1 instead and apply a prefactor retroactively
+        except KeyError: #If unable to load, load 1 instead and apply a prefactor retroactively
             y = pref*loaddata('disk','pref1',**kwargs)[1]
             x = loaddata('disk','pref1',**kwargs)[0]
         a = inter.InterpolatedUnivariateSpline(x,y,k=3) #k is the order of the polynomial
@@ -343,13 +344,16 @@ def d_v(r,pref=1,save=False,load=False,**kwargs): #velocity
 def v(r,M=Mbh_def,n=n_c,pref=1,rc=h_rc,rho00=rho00_c,save=False,load=False,**kwargs): 
     a = np.sqrt(np.sqrt(h_v(r,rc,rho00)**2+d_v(r,pref,L)**2+bh_v(r,M)**2+b_v(r,n)**2))
     a[np.isnan(a)] = 0
-    if save:
+    if load:
+        try: #Load if exists
+            y = loaddata('total','Mbh'+str(M)+'n'+str(n)+'n'+str(pref)+'rc'+str(rc)+'rho00'+str(rho00),**kwargs)[1]
+            x = loaddata('total','Mbh'+str(M)+'n'+str(n)+'n'+str(pref)+'rc'+str(rc)+'rho00'+str(rho00),**kwargs)[0]
+            b = inter.InterpolatedUnivariateSpline(x,y,k=3)
+            return b(r)
+        except KeyError: #If does not exist,
+            save = True  #Save instead
+    if save: #not elif since that would mean don't check if load was true, which I don't want in this case
         savedata(r,a,'total','Mbh'+str(M)+'n'+str(n)+'n'+str(pref)+'rc'+str(rc)+'rho00'+str(rho00),**kwargs)
         return a
-    elif load:
-        y = loaddata('total','Mbh'+str(M)+'n'+str(n)+'n'+str(pref)+'rc'+str(rc)+'rho00'+str(rho00),**kwargs)[1]
-        x = loaddata('total','Mbh'+str(M)+'n'+str(n)+'n'+str(pref)+'rc'+str(rc)+'rho00'+str(rho00),**kwargs)[0]
-        a = inter.InterpolatedUnivariateSpline(x,y,k=3)
-        return a(r)
-    else:
+    elif not load: #If load was false,
         return a
