@@ -50,7 +50,7 @@ h_c = 8.9                           #radial scale-length (kpc)
 rho00_c = 0.31e9                    #central surface density (solar mass/kpc^3)
 
 #---------Uncategorized-------------------
-re = 9.9                                                 #1kpc
+re_c = 9.9                                               #effective radius (kpc)
 epsdisk = 5.0                                            #from Noordermeer's paper
 rs = (1/c)*(((3*Mvir)/((4*np.pi*100*rhocrit)))**(1/3))   #scale radius (kpc)
 rho_s = (100/3)*((c**3)/(np.log(1+c)-(c/(1+c))))*rhocrit #characteristic density
@@ -173,33 +173,33 @@ def b_gammafunc(x,n=n_c):
     return ss.gammainc(2*n,x)*ss.gamma(2*n)-0.5*ss.gamma(2*n)
 b_root = so.brentq(b_gammafunc,0,500000,rtol=0.000001,maxiter=100) #come within 1% of exact root within 100 iterations
 
-def b_I0(n=n_c):
+def b_I0(n=n_c,re=re_c):
     return L*(b_root**(2*n))/(re**2*2*np.pi*n*ss.gamma(2*n))
-def b_r0(n=n_c):
+def b_r0(n=n_c,re=re_c):
     return re/np.power(b_root,n)
 
-def b_innerintegral(m,n=n_c):
-    f = lambda x,m,n: np.exp(-np.power(x/b_r0(n), (1/n)))*np.power(x/b_r0(n), 1/n-1)/(np.sqrt(x**2-m**2)) #Inner function
-    return si.quad(f, m, np.inf,args=(m,n))[0]
+def b_innerintegral(m,n=n_c,re=re_c):
+    f = lambda x,m,n,re: np.exp(-np.power(x/b_r0(n,re), (1/n)))*np.power(x/b_r0(n,re), 1/n-1)/(np.sqrt(x**2-m**2)) #Inner function
+    return si.quad(f, m, np.inf,args=(m,n,re))[0]
 b_innerintegralv = np.vectorize(b_innerintegral)
 
-def b_vsquare(r,n=n_c):
-    C = lambda n: (4*G*q*ups*b_I0(n))/(b_r0(n)*np.float(n))*(np.sqrt((np.sin(i)**2)+(1/(q**2))*(np.cos(i)**2)))
-    h = lambda m,r,n: C(n)*b_innerintegral(m,n)*(m**2)/(np.sqrt((r**2)-((m**2)*(e2)))) #integrate outer function
-    return si.quad(h, 0, r, args=(r,n))[0]
-def b_vsquarev(r,n=n_c):
+def b_vsquare(r,n=n_c,re=re_c):
+    C = lambda n,re: (4*G*q*ups*b_I0(n,re))/(b_r0(n,re)*np.float(n))*(np.sqrt((np.sin(i)**2)+(1/(q**2))*(np.cos(i)**2)))
+    h = lambda m,r,n,re: C(n,re)*b_innerintegral(m,n,re)*(m**2)/(np.sqrt((r**2)-((m**2)*(e2)))) #integrate outer function
+    return si.quad(h, 0, r, args=(r,n,re))[0]
+def b_vsquarev(r,n=n_c,re=re_c):
     a = np.vectorize(b_vsquare)
-    return a(r,n)
+    return a(r,n,re)
 
-def b_v(r,n=n_c,save=False,load=False,**kwargs):
-    a = b_vsquarev(r,n)**(1/2)
+def b_v(r,n=n_c,re=re_c,save=False,load=False,**kwargs):
+    a = b_vsquarev(r,n,re)**(1/2)
     a[np.isnan(a)] = 0
     if save:
-        savedata(r,a,'bulge','n'+str(n),**kwargs)
+        savedata(r,a,'bulge','n'+str(n)+'re'+str(re),**kwargs)
         return a
     elif load:
-        y = loaddata('bulge','n'+str(n),**kwargs)[1]
-        x = loaddata('bulge','n'+str(n),**kwargs)[0]
+        y = loaddata('bulge','n'+str(n)+'re'+str(re),**kwargs)[1]
+        x = loaddata('bulge','n'+str(n)+'re'+str(re),**kwargs)[0]
         a = inter.InterpolatedUnivariateSpline(x,y,k=3) #k is the order of the polynomial
         return a(r)
     else:
