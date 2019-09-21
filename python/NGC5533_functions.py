@@ -149,8 +149,8 @@ def bh_v(r,M=Mbh_def,save=False,load=False,**kwargs): #M in solar masses, r in k
             y = loaddata('blackhole','Mbh'+str(M),**kwargs)[1]
             x = loaddata('blackhole','Mbh'+str(M),**kwargs)[0]
         except KeyError: #If unable to load, load default instead and apply a prefactor retroactively
-            y = M*loaddata('bh','Mbh1',**kwargs)[1]
-            x = loaddata('bh','Mbh1',**kwargs)[0]
+            y = M*loaddata('blackhole','Mbh1',**kwargs)[1]
+            x = loaddata('blackhole','Mbh1',**kwargs)[0]
         a = inter.InterpolatedUnivariateSpline(x,y,k=3) #k is the order of the polynomial
         return a(r)
         return loaddata('blackhole','Mbh'+str(M),**kwargs)
