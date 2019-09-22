@@ -187,8 +187,6 @@ def b_vsquarev(r,n=n_c,re=re_c):
     return a(r,n,re)
 
 def b_v(r,n=n_c,re=re_c,save=False,load=False,**kwargs):
-    a = b_vsquarev(r,n,re)**(1/2)
-    a[np.isnan(a)] = 0
     if load:
         try: #load if exists
             y = loaddata('bulge','n'+str(n)+'re'+str(re),**kwargs)[1]
@@ -197,6 +195,8 @@ def b_v(r,n=n_c,re=re_c,save=False,load=False,**kwargs):
             return b(r)
         except KeyError: #if does not exist,
             save = True  #go to save function instead
+    a = b_vsquarev(r,n,re)**(1/2)
+    a[np.isnan(a)] = 0
     if save:
         savedata(r,a,'bulge','n'+str(n)+'re'+str(re),**kwargs)
         return a
@@ -313,8 +313,8 @@ def d_outerintegral(r,h=h_c,d_rho00=rho00_c): #Integrate Outer Function
 
 def d_Mdblintrho(r,h=h_c,d_rho00=rho00_c):    #M double-integral rho
     rho_rz_r = lambda z,r,h,d_rho00: d_rho_rz(r,z,h,d_rho00)*r
-    d_Mintrho = lambda r,h,d_rho00: si.quad(rho_rz_r, -125, -1, args=(r,h,d_rho00))[0] + si.quad(rho_rz_r, 1, 125, args=(r,h,d_rho00))[0]
-    return si.quad(d_Mintrho,-125,125,args=(h,d_rho00))[0]
+    d_Mintrho = lambda r,h,d_rho00: si.quad(rho_rz_r, -125, 125, args=(r,h,d_rho00))[0]
+    return si.quad(d_Mintrho,0,125,args=(h,d_rho00))[0]
 
 def d_F(r,pref=1): #multiplying by upsylon
     return 4*np.pi*G*d_outerintegral(r,h_c,rho00_c)*pref
