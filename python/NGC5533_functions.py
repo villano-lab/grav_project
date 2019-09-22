@@ -37,15 +37,15 @@ L0 = np.power(10, (0.4*(magsun-absmag))) #Absolute Magnitude to luminosity
 #---------Measured Indirectly---------
 ups = 2.8                         #mass-to-light ratio (from Rotation Curves of Sersic Bulges paper)
 q = 0.33                          #intrinsic axis ratio
-e2 = 1-(q**2)
+e2 = 1-(q**2)                     #eccentricity
 i = 45*(np.pi/180)                #inclination angle
 h_rc = 1.4                        #core radius (kpc)
-c = 1e-12                         #concentration parameter
+c = 1e-12                         #(what does this constant do?)
 Mvir = 1e11*((c/(11.7))**(-40/3)) #virial mass (in solar mass) solved from eq(5)
-Mbh_def = 2.7e9                   #Black Hole mass
+Mbh_def = 2.7e9                   #Black Hole mass (in solar mass)
 
 #---------Definitely Variable---------
-n_c = 2.7
+n_c = 2.7                           #concentration parameter
 h_c = 8.9                           #radial scale-length (kpc)
 rho00_c = 0.31e9                    #central surface density (solar mass/kpc^3)
 
