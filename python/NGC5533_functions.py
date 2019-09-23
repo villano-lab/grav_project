@@ -140,7 +140,8 @@ def loaddata(group,dataset,path='./',file='Inputs.hdf5'):
 ################################
 
 def bh_v(r,M=Mbh_def,save=False,load=False,**kwargs): #M in solar masses, r in kpc
-    r = np.asarray(r)
+    if isinstance(r,float) or isinstance(r,int):
+        r = np.asarray([r])
     a = np.sqrt(G*M/r)
     if save:
         savedata(r,a,'blackhole','Mbh'+str(M),**kwargs)
@@ -188,7 +189,8 @@ def b_vsquarev(r,n=n_c,re=re_c):
     return a(r,n,re)
 
 def b_v(r,n=n_c,re=re_c,save=False,load=False,**kwargs):
-    r = np.asarray(r)
+    if isinstance(r,float) or isinstance(r,int):
+        r = np.asarray([r])
     if load:
         try: #load if exists
             y = loaddata('bulge','n'+str(n)+'re'+str(re),**kwargs)[1]
@@ -239,7 +241,8 @@ def h_vNFW(r,save=True,**kwargs):
         return a(r)
 
 def h_viso(r,rc=h_rc,rho00=rho00_c,load=False,save=False,**kwargs):   #h_v iso
-    r = np.asarray(r)
+    if isinstance(r,float) or isinstance(r,int):
+        r = np.asarray([r])
     a = np.sqrt(4*np.pi*G*rho00*(rc**2)*(1-((rc/r)*np.arctan(r/rc))))
     a[np.isnan(a)] = 0
     if load:
@@ -324,6 +327,8 @@ def d_F(r,pref=1): #multiplying by upsylon
 d_Fv = np.vectorize(d_F)
 
 def d_v(r,pref=1,save=False,load=False,**kwargs): #velocity
+    if isinstance(r,float) or isinstance(r,int):
+        r = np.asarray([r])
     if save:
         r = np.asarray(r)
         a = np.sqrt(-r*d_Fv(r,pref))
@@ -346,7 +351,8 @@ def d_v(r,pref=1,save=False,load=False,**kwargs): #velocity
 ############ Total #############
 ################################
 def v(r,M=Mbh_def,n=n_c,pref=1,rc=h_rc,rho00=rho00_c,save=False,load=False,**kwargs): 
-    r = np.asarray(r)
+    if isinstance(r,float) or isinstance(r,int):
+        r = np.asarray([r])
     a = np.sqrt(np.sqrt(h_v(r,rc,rho00)**2+d_v(r,pref,L)**2+bh_v(r,M)**2+b_v(r,n)**2))
     a[np.isnan(a)] = 0
     if load:
