@@ -325,7 +325,7 @@ def d_Mdblintrho(r,h=h_c,d_rho00=drho00_c):    #M double-integral rho
     return si.quad(d_Mintrho,0,125,args=(h,d_rho00))[0]
 
 def d_F(r,h=h_c,d_rho00=drho00_c,pref=1): #multiplying by upsylon
-    return 4*np.pi*G*d_outerintegral(r,h_c,rho00_c)*pref
+    return 4*np.pi*G*d_outerintegral(r,h_c,d_rho00)*pref
 d_Fv = np.vectorize(d_F)
 
 def d_v(r,h=h_c,d_rho00=drho00_c,pref=1,save=False,load=False,**kwargs): #velocity
