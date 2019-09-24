@@ -39,10 +39,10 @@ Mvir = 1e11*((c/(11.7))**(-40/3)) #virial mass (in solar mass) solved from eq(5)
 Mbh_def = 2.7e9                   #Black Hole mass (in solar mass)
 
 #---------Definitely Variable---------
-n_c = 2.7                           #concentration parameter
-h_c = 8.9                           #radial scale-length (kpc)
-hrho00_c = 0.31e9                   #halo central surface density (solar mass/kpc^3)
-drho00_c = 0.31e9                   #disk central surface density (solar mass/kpc^3)
+n_c = 2.7                         #concentration parameter
+h_c = 8.9                         #radial scale-length (kpc)
+hrho00_c = 0.31e9                 #halo central surface density (solar mass/kpc^3)
+drho00_c = 0.31e9                 #disk central surface density (solar mass/kpc^3)
 
 #---------Uncategorized-------------------
 re_c = 9.9                                               #effective radius (kpc)
@@ -329,6 +329,8 @@ def d_v(r,h=h_c,d_rho00=drho00_c,pref=1,save=False,load=False,**kwargs): #veloci
         try: #Load existing prefactor if available
             y = loaddata('disk','h'+str(h)+'d_rho00'+str(d_rho00)+'pref'+str(pref),**kwargs)[1]
             x = loaddata('disk','h'+str(h)+'d_rho00'+str(d_rho00)+'pref'+str(pref),**kwargs)[0]
+            b = inter.InterpolatedUnivariateSpline(x,y,k=3) #k is the order of the polynomial
+            return b(r)
         except KeyError: #If unable to load, load 1 instead and apply a prefactor retroactively
             save = True
     if save:
