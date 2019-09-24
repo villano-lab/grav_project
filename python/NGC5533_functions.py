@@ -339,7 +339,7 @@ def d_v(r,h=h_c,d_rho00=drho00_c,pref=1,save=False,load=False,**kwargs): #veloci
         savedata(r,a,'disk','h'+str(h)+'d_rho00'+str(d_rho00)+'pref'+str(pref),**kwargs)
         return a
     else:
-        a = np.sqrt(-r*d_Fv(r,pref))
+        a = np.sqrt(-r*d_Fv(r,h,d_rho00,pref))
         return a
 
 ################################
