@@ -327,8 +327,8 @@ def d_F(r,h=h_c,d_rho00=drho00_c,pref=pref_def): #multiplying by upsylon. Genera
     if pref == False:
         pref = epsdisk*(L0/d_Mdblintrho(r,h,d_rho00))
     val = 4*np.pi*G*d_outerintegral(r,h,d_rho00)*pref
-    if val == np.nan:
-        return 0
+    if np.isnan(val):
+        return np.inf
     else:
         return val
 d_Fv = np.vectorize(d_F)
