@@ -47,7 +47,8 @@ Mbh_def = 2.7e9                   #Black Hole mass (in solar mass)
 #---------Definitely Variable---------
 n_c = 2.7                           #concentration parameter
 h_c = 8.9                           #radial scale-length (kpc)
-rho00_c = 0.31e9                    #central surface density (solar mass/kpc^3)
+hrho00_c = 0.31e9                   #halo central surface density (solar mass/kpc^3)
+drho00_c = 0.31e9                   #disk central surface density (solar mass/kpc^3)
 
 #---------Uncategorized-------------------
 re_c = 9.9                                               #effective radius (kpc)
@@ -102,7 +103,7 @@ def savedata(xvalues,yvalues,group,dataset,path='./',file='Inputs.hdf5'):
                 savedata(x,y,group,dataset,path,file)
                 return y
         saved.close()
-        print("Saved.")
+        #print("Saved.") #Convenient for debugging but annoying for fitting.
     if h5py == 0:
         print("ERROR: h5py was not loaded.")
         return 1
@@ -142,6 +143,8 @@ def loaddata(group,dataset,path='./',file='Inputs.hdf5'):
 def bh_v(r,M=Mbh_def,save=False,load=False,**kwargs): #M in solar masses, r in kpc
     if isinstance(r,float) or isinstance(r,int):
         r = np.asarray([r])
+    if isinstance(r,list):
+        r = np.asarray(r)
     a = np.sqrt(G*M/r)
     if save:
         savedata(r,a,'blackhole','Mbh'+str(M),**kwargs)
@@ -213,14 +216,14 @@ def b_v(r,n=n_c,re=re_c,save=False,load=False,**kwargs):
 def h_rhat(r,z):               #r-hat from Casertano eq(9)
     return np.sqrt((r**2)+(z**2))
 
-def h_rho(r,rho00=rho00_c,rc=h_rc): #Isothermal Density Profile
+def h_rho(r,rho00=hrho00_c,rc=h_rc): #Isothermal Density Profile
     return rho00*((1+((r/rc)**2))**(-1))
     
-def h_vcasertano(r,z,rc=h_rc,rho00=rho00_c,gamma=h_gamma):                       #Velocity
+def h_vcasertano(r,z,rc=h_rc,rho00=hrho00_c,gamma=h_gamma):                       #Velocity
     v0h = lambda r,rho00,rc,z: np.sqrt(h_rho(r,rho00,rc)*4*np.pi*G*(h_rhat(r,z)**2)) #eq 9 casertano
     return v0h(r,rho00,rc,z)*((r/rc)**gamma)                                     #eq 10 casertano
 
-def h_vjimenez(r,rc=h_rc,rho00=rho00_c):
+def h_vjimenez(r,rc=h_rc,rho00=hrho00_c):
     return np.sqrt(4*np.pi*G*rho00*(rc**2)*(1-((rc/r)*np.arctan(r/rc))))
 
 def h_vNFW(r,save=True,**kwargs):
@@ -239,7 +242,7 @@ def h_vNFW(r,save=True,**kwargs):
     else:
         return a(r)
 
-def h_viso(r,rc=h_rc,rho00=rho00_c,load=False,save=False,**kwargs):   #h_v iso
+def h_viso(r,rc=h_rc,rho00=hrho00_c,load=False,save=False,**kwargs):   #h_v iso
     if isinstance(r,float) or isinstance(r,int):
         r = np.asarray([r])
     a = np.sqrt(4*np.pi*G*rho00*(rc**2)*(1-((rc/r)*np.arctan(r/rc))))
@@ -279,7 +282,7 @@ def d_px(r,u,xi):       #Initial Function
     x = lambda r,u,xi: (r**2+u**2+xi**2)/(2*r*u)
     return x(r,u,xi)-(np.sqrt(x(r,u,xi)**2-1))
 
-def d_rho0(r, h=h_c, d_rho00=rho00_c): #density piecewise function
+def d_rho0(r, h=h_c, d_rho00=drho00_c): #density piecewise function
     conditions = [r <= R(h),
                   (r > R(h)) & (r <= R(h)+d(h)), 
                   r > R(h)+d(h)]
@@ -288,7 +291,7 @@ def d_rho0(r, h=h_c, d_rho00=rho00_c): #density piecewise function
                  lambda r,h,d_rho00: 0]
     return np.piecewise(r, conditions, functions, h, d_rho00)
 
-def d_durho0(r, h=h_c, d_rho00=rho00_c): #partial derivative of rho(u,xi)
+def d_durho0(r, h=h_c, d_rho00=drho00_c): #partial derivative of rho(u,xi)
     conditions = [r <= R(h),
                   (r > R(h)) & (r <= (R(h)+d(h))),
                   r > (R(h)+d(h))]
@@ -298,50 +301,47 @@ def d_durho0(r, h=h_c, d_rho00=rho00_c): #partial derivative of rho(u,xi)
     return np.piecewise(r, conditions, functions, h, d_rho00)
 
 #Disk Density Distribution
-def d_rho_rz(r,z,h=h_c,d_rho00=rho00_c):
+def d_rho_rz(r,z,h=h_c,d_rho00=drho00_c):
     return d_rho0(r, h, d_rho00)*np.power(np.cosh(z/z0(h)), -2)
-def d_drho_rz(r,z,h=h_c,d_rho00=rho00_c):
+def d_drho_rz(r,z,h=h_c,d_rho00=drho00_c):
     return d_durho0(r, h, d_rho00)*np.power(np.cosh(z/z0(h)), -2)
 
 def d_K(r,u,xi): #Complete Elliptic Integral
     return 2*(ss.ellipk(d_px(r,u,xi)) - ss.ellipe(d_px(r,u,xi)))/(np.pi*np.sqrt(r*u*d_px(r,u,xi)))
 
-def d_innerfunc(z,r,u,h=h_c,d_rho00=rho00_c):  #Inner Function (3D)
+def d_innerfunc(z,r,u,h=h_c,d_rho00=drho00_c):  #Inner Function (3D)
     return d_drho_rz(u, z, h, d_rho00)*d_K(r,u,z)
 
-def d_innerintegral(u,r,h=h_c,d_rho00=rho00_c): #Integrate Function
-    return u*si.quad(d_innerfunc, 1, 125, args=(u,r,h,d_rho00))[0]
+def d_innerintegral(u,r,h=h_c,d_rho00=drho00_c): #Integrate Function
+    return u*si.quad(d_innerfunc, 0.1, 125, args=(u,r,h,d_rho00))[0]
 #Args passed into quad need to be numbers, not arrays. (?)
 
-def d_outerintegral(r,h=h_c,d_rho00=rho00_c): #Integrate Outer Function
-    return si.quad(d_innerintegral, 1, 125, args=(r,h,d_rho00))[0]
+def d_outerintegral(r,h=h_c,d_rho00=drho00_c): #Integrate Outer Function
+    return si.quad(d_innerintegral, 0.1, 125, args=(r,h,d_rho00))[0]
 
-def d_Mdblintrho(r,h=h_c,d_rho00=rho00_c):    #M double-integral rho
+def d_Mdblintrho(r,h=h_c,d_rho00=drho00_c):    #M double-integral rho
     rho_rz_r = lambda z,r,h,d_rho00: d_rho_rz(r,z,h,d_rho00)*r
     d_Mintrho = lambda r,h,d_rho00: si.quad(rho_rz_r, -125, 125, args=(r,h,d_rho00))[0]
     return si.quad(d_Mintrho,0,125,args=(h,d_rho00))[0]
 
-def d_F(r,pref=1): #multiplying by upsylon
-    return 4*np.pi*G*d_outerintegral(r,h_c,rho00_c)*pref
+def d_F(r,h=h_c,d_rho00=drho00_c,pref=1): #multiplying by upsylon
+    return 4*np.pi*G*d_outerintegral(r,h_c,d_rho00)*pref
 d_Fv = np.vectorize(d_F)
 
-def d_v(r,pref=1,save=False,load=False,**kwargs): #velocity
+def d_v(r,h=h_c,d_rho00=drho00_c,pref=1,save=False,load=False,**kwargs): #velocity
     if isinstance(r,float) or isinstance(r,int):
         r = np.asarray([r])
+    if load:
+        try: #Load existing prefactor if available
+            y = loaddata('disk','h'+str(h)+'d_rho00'+str(d_rho00)+'pref'+str(pref),**kwargs)[1]
+            x = loaddata('disk','h'+str(h)+'d_rho00'+str(d_rho00)+'pref'+str(pref),**kwargs)[0]
+        except KeyError: #If unable to load, load 1 instead and apply a prefactor retroactively
+            save = True
     if save:
         r = np.asarray(r)
-        a = np.sqrt(-r*d_Fv(r,pref))
-        savedata(r,a,'disk','pref'+str(pref),**kwargs)
+        a = np.sqrt(-r*d_Fv(r,h,d_rho00,pref))
+        savedata(r,a,'disk','h'+str(h)+'d_rho00'+str(d_rho00)+'pref'+str(pref),**kwargs)
         return a
-    elif load:
-        try: #Load existing prefactor if available
-            y = loaddata('disk','pref'+str(pref),**kwargs)[1]
-            x = loaddata('disk','pref'+str(pref),**kwargs)[0]
-        except KeyError: #If unable to load, load 1 instead and apply a prefactor retroactively
-            y = pref*loaddata('disk','pref1',**kwargs)[1]
-            x = loaddata('disk','pref1',**kwargs)[0]
-        a = inter.InterpolatedUnivariateSpline(x,y,k=3) #k is the order of the polynomial
-        return a(r)
     else:
         a = np.sqrt(-r*d_Fv(r,pref))
         return a
@@ -349,21 +349,21 @@ def d_v(r,pref=1,save=False,load=False,**kwargs): #velocity
 ################################
 ############ Total #############
 ################################
-def v(r,M=Mbh_def,n=n_c,pref=1,rc=h_rc,rho00=rho00_c,save=False,load=False,**kwargs): 
+def v(r,M=Mbh_def,re=re_c,h=h_c,d_rho00=drho00_c,pref=1,rc=h_rc,rho00=hrho00_c,save=False,load=False,**kwargs): 
     if isinstance(r,float) or isinstance(r,int):
         r = np.asarray([r])
-    a = np.sqrt(np.sqrt(h_v(r,rc,rho00)**2+d_v(r,pref,L)**2+bh_v(r,M)**2+b_v(r,n)**2))
+    a = np.sqrt(np.sqrt(h_v(r,rc,rho00)**2+d_v(r,h,drho00,pref)**2+bh_v(r,M)**2+b_v(r,re)**2))
     a[np.isnan(a)] = 0
     if load:
         try: #Load if exists
-            y = loaddata('total','Mbh'+str(M)+'n'+str(n)+'n'+str(pref)+'rc'+str(rc)+'rho00'+str(rho00),**kwargs)[1]
-            x = loaddata('total','Mbh'+str(M)+'n'+str(n)+'n'+str(pref)+'rc'+str(rc)+'rho00'+str(rho00),**kwargs)[0]
+            loaddata('total','Mbh'+str(M)+'re'+str(re)+'h'+str(h)+'d_rho00'+str(d_rho00)+'pref'+str(pref) +'rc'+str(rc)+'rho00'+str(rho00), **kwargs)[1]
+            x = loaddata('total','Mbh'+str(M)+'re'+str(re)+'h'+str(h)+'d_rho00'+str(d_rho00)+'pref'+str(pref) +'rc'+str(rc)+'rho00'+str(rho00), **kwargs)[0]
             b = inter.InterpolatedUnivariateSpline(x,y,k=3)
             return b(r)
         except KeyError: #If does not exist,
             save = True  #Save instead
     if save: #not elif since that would mean don't check if load was true, which I don't want in this case
-        savedata(r,a,'total','Mbh'+str(M)+'n'+str(n)+'n'+str(pref)+'rc'+str(rc)+'rho00'+str(rho00),**kwargs)
+        savedata(r,a,'total','Mbh'+str(M)+'re'+str(re)+'h'+str(h)+'d_rho00'+str(d_rho00)+'pref'+str(pref) +'rc'+str(rc)+'rho00'+str(rho00),**kwargs)
         return a
     elif not load: #If load was false,
         return a
