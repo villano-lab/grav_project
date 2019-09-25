@@ -315,15 +315,15 @@ def d_innerintegral(u,r,h=h_c,d_rho00=drho00_c): #Integrate Function
 #Args passed into quad need to be numbers, not arrays. (?)
 
 def d_outerintegral(r,h=h_c,d_rho00=drho00_c): #Integrate Outer Function
-    return si.quad(d_innerintegral, 1, 125, args=(r,h,d_rho00))[0]
+    return si.quad(d_innerintegral, 0.1, 125, args=(r,h,d_rho00))[0]
 
 def d_Mdblintrho(r,h=h_c,d_rho00=drho00_c):    #M double-integral rho
     rho_rz_r = lambda z,r,h,d_rho00: d_rho_rz(r,z,h,d_rho00)*r
-    d_Mintrho = lambda r,h,d_rho00: si.quad(rho_rz_r, -125, -0.1, args=(r,h,d_rho00))[0] + si.quad(rho_rz_r, 0.1, 125, args=(r,h,d_rho00))[0]
-    return si.quad(d_Mintrho,-125,125,args=(h,d_rho00))[0]
+    d_Mintrho = lambda r,h,d_rho00: si.quad(rho_rz_r, -200, -0.1, args=(r,h,d_rho00))[0] + si.quad(rho_rz_r, 0.1, 200, args=(r,h,d_rho00))[0]
+    return si.quad(d_Mintrho,-200,200,args=(h,d_rho00))[0]
 
 def d_F(r,h=h_c,d_rho00=drho00_c,pref=1): #multiplying by upsylon
-    return 4*np.pi*G*d_outerintegral(r,h_c,rho00_c)*pref
+    return 4*np.pi*G*d_outerintegral(r,h,d_rho00)*pref
 d_Fv = np.vectorize(d_F)
 
 def d_v(r,h=h_c,d_rho00=drho00_c,pref=1,save=False,load=False,**kwargs): #velocity
@@ -331,7 +331,7 @@ def d_v(r,h=h_c,d_rho00=drho00_c,pref=1,save=False,load=False,**kwargs): #veloci
     #    r = np.asarray([r])
     if save:
         r = np.asarray(r)
-        a = np.sqrt(-r*d_Fv(r,pref))
+        a = np.sqrt(-r*d_Fv(r,h,d_rho00,pref))
         savedata(r,a,'disk','h'+str(h)+'d_rho00'+str(d_rho00)+'pref'+str(pref),**kwargs)
         return a
     elif load:
@@ -344,7 +344,7 @@ def d_v(r,h=h_c,d_rho00=drho00_c,pref=1,save=False,load=False,**kwargs): #veloci
         a = inter.InterpolatedUnivariateSpline(x,y,k=3) #k is the order of the polynomial
         return a(r)
     else:
-        a = np.sqrt(-r*d_Fv(r,pref))
+        a = np.sqrt(-r*d_Fv(r,h,d_rho00,pref))
         return a
 
 ################################
