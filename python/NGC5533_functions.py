@@ -349,21 +349,21 @@ def d_v(r,h=h_c,d_rho00=drho00_c,pref=1,save=False,load=False,**kwargs): #veloci
 ################################
 ############ Total #############
 ################################
-def v(r,M=Mbh_def,re=re_c,h=h_c,d_rho00=drho00_c,pref=1,rc=h_rc,rho00=hrho00_c,save=False,load=False,**kwargs): 
+def v(r,M=Mbh_def,re=re_c,h=h_c,d_rho00=drho00_c,pref=1,rc=h_rc,h_rho00=hrho00_c,save=False,load=False,**kwargs): 
     if isinstance(r,float) or isinstance(r,int):
         r = np.asarray([r])
-    a = np.sqrt(np.sqrt(h_v(r,rc,rho00)**2+d_v(r,h,drho00,pref)**2+bh_v(r,M)**2+b_v(r,re)**2))
+    a = np.sqrt(np.sqrt(h_v(r,rc,h_rho00)**2+d_v(r,h,d_rho00,pref)**2+bh_v(r,M)**2+b_v(r,re)**2))
     a[np.isnan(a)] = 0
     if load:
         try: #Load if exists
-            loaddata('total','Mbh'+str(M)+'re'+str(re)+'h'+str(h)+'d_rho00'+str(d_rho00)+'pref'+str(pref) +'rc'+str(rc)+'rho00'+str(rho00), **kwargs)[1]
-            x = loaddata('total','Mbh'+str(M)+'re'+str(re)+'h'+str(h)+'d_rho00'+str(d_rho00)+'pref'+str(pref) +'rc'+str(rc)+'rho00'+str(rho00), **kwargs)[0]
+            y = loaddata('total','Mbh'+str(M)+'re'+str(re)+'h'+str(h)+'d_rho00'+str(d_rho00)+'pref'+str(pref) +'rc'+str(rc)+'h_rho00'+str(h_rho00), **kwargs)[1]
+            x = loaddata('total','Mbh'+str(M)+'re'+str(re)+'h'+str(h)+'d_rho00'+str(d_rho00)+'pref'+str(pref) +'rc'+str(rc)+'h_rho00'+str(h_rho00), **kwargs)[0]
             b = inter.InterpolatedUnivariateSpline(x,y,k=3)
             return b(r)
         except KeyError: #If does not exist,
             save = True  #Save instead
     if save: #not elif since that would mean don't check if load was true, which I don't want in this case
-        savedata(r,a,'total','Mbh'+str(M)+'re'+str(re)+'h'+str(h)+'d_rho00'+str(d_rho00)+'pref'+str(pref) +'rc'+str(rc)+'rho00'+str(rho00),**kwargs)
+        savedata(r,a,'total','Mbh'+str(M)+'re'+str(re)+'h'+str(h)+'d_rho00'+str(d_rho00)+'pref'+str(pref) +'rc'+str(rc)+'h_rho00'+str(h_rho00),**kwargs)
         return a
     elif not load: #If load was false,
         return a
