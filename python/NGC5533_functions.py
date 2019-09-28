@@ -15,12 +15,6 @@ except ModuleNotFoundError:
     print("Could not find h5py. Datasets will not be able to be saved or loaded using NGC5533_functions.")
 
 ################################
-########## Settings ############
-################################    
-
-options={'limit':100}     #Sets maximum subdivisions to 100 for integration instead of 50
-
-################################
 ########## Constants ###########
 ################################
 
