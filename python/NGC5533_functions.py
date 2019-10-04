@@ -310,7 +310,7 @@ def d_innerfunc(z,r,u,h=h_c,d_rho00=drho00_c):  #Inner Function (3D)
     return d_drho_rz(u, z, h, d_rho00)*d_K(r,u,z)
 
 def d_innerintegral(u,r,h=h_c,d_rho00=drho00_c): #Integrate Function
-    return u*si.quad(d_innerfunc, 0.1, 125, args=(r,u,h,d_rho00))[0]
+    return u*si.quad(d_innerfunc, 0, np.inf, args=(r,u,h,d_rho00))[0]
 #Args passed into quad need to be numbers, not arrays. (?)
 
 def d_outerintegral(r,h=h_c,d_rho00=drho00_c): #Integrate Outer Function
