@@ -274,7 +274,10 @@ d = lambda h: 0.2*h                         #cut-off length upper limits (kpc)
 
 def d_px(r,u,xi):       #Initial Function
     x = lambda r,u,xi: (r**2+u**2+xi**2)/(2*r*u)
-    return x(r,u,xi)-(np.sqrt(x(r,u,xi)**2-1))
+    try:
+        return x(r,u,xi)-(np.sqrt(x(r,u,xi)**2-1))
+    except ZeroDivisionError: #If dividing by zero, return infinity instead of error. (Mostly at 0)
+        return np.inf
 
 def d_rho0(r, h=h_c, d_rho00=drho00_c): #density piecewise function
     conditions = [r <= R(h),
@@ -307,16 +310,17 @@ def d_innerfunc(z,r,u,h=h_c,d_rho00=drho00_c):  #Inner Function (3D)
     return d_drho_rz(u, z, h, d_rho00)*d_K(r,u,z)
 
 def d_innerintegral(u,r,h=h_c,d_rho00=drho00_c): #Integrate Function
-    return u*si.quad(d_innerfunc, 0.1, 125, args=(u,r,h,d_rho00))[0]
+    return u*si.quad(d_innerfunc, 0.1, 125, args=(r,u,h,d_rho00))[0]
 #Args passed into quad need to be numbers, not arrays. (?)
 
 def d_outerintegral(r,h=h_c,d_rho00=drho00_c): #Integrate Outer Function
     return si.quad(d_innerintegral, 0.1, 125, args=(r,h,d_rho00))[0]
 
-def d_Mdblintrho(r,h=h_c,d_rho00=drho00_c):    #M double-integral rho
-    rho_rz_r = lambda z,r,h,d_rho00: d_rho_rz(r,z,h,d_rho00)*r
-    d_Mintrho = lambda r,h,d_rho00: si.quad(rho_rz_r, -125, 125, args=(r,h,d_rho00))[0]
-    return si.quad(d_Mintrho,0,125,args=(h,d_rho00))[0]
+#def d_Mdblintrho(r,h=h_c,d_rho00=drho00_c):    #M double-integral rho
+#    rho_rz_r = lambda z,r,h,d_rho00: d_rho_rz(r,z,h,d_rho00)*r
+#    Mintrho = lambda r,h,d_rho00: si.quad(rho_rz_r, -125, 125, args=(r,h,d_rho00))[0]
+#    return si.quad(d_Mintrho,0,125,args=(h,d_rho00))[0]
+#This is never called
 
 def d_F(r,h=h_c,d_rho00=drho00_c,pref=1): #multiplying by upsylon
     return 4*np.pi*G*d_outerintegral(r,h,d_rho00)*pref
