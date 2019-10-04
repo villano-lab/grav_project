@@ -277,7 +277,7 @@ def d_px(r,u,xi):       #Initial Function
     try:
         return x(r,u,xi)-(np.sqrt(x(r,u,xi)**2-1))
     except ZeroDivisionError: #If dividing by zero, return infinity instead of error. (Mostly at 0)
-        return np.inf
+        return np.nan
 
 def d_rho0(r, h=h_c, d_rho00=drho00_c): #density piecewise function
     conditions = [r <= R(h),
@@ -311,24 +311,28 @@ def d_innerfunc(z,r,u,h=h_c,d_rho00=drho00_c):  #Inner Function (3D)
 
 def d_innerintegral(u,r,h=h_c,d_rho00=drho00_c): #Integrate Function
     return u*si.quad(d_innerfunc, 0.1, 125, args=(r,u,h,d_rho00))[0]
-#Args passed into quad need to be numbers, not arrays. (?)
 
 def d_outerintegral(r,h=h_c,d_rho00=drho00_c): #Integrate Outer Function
     return si.quad(d_innerintegral, 0.1, 125, args=(r,h,d_rho00))[0]
 
-#def d_Mdblintrho(r,h=h_c,d_rho00=drho00_c):    #M double-integral rho
-#    rho_rz_r = lambda z,r,h,d_rho00: d_rho_rz(r,z,h,d_rho00)*r
-#    Mintrho = lambda r,h,d_rho00: si.quad(rho_rz_r, -125, 125, args=(r,h,d_rho00))[0]
-#    return si.quad(d_Mintrho,0,125,args=(h,d_rho00))[0]
-#This is never called
+def d_Mdblintrho(h=h_c,d_rho00=drho00_c):    #M double-integral rho
+    rho_rz_r = lambda z,r,h,d_rho00: d_rho_rz(r,z,h,d_rho00)*r
+    Mintrho = lambda r,h,d_rho00: si.quad(rho_rz_r, -125, 125, args=(r,h,d_rho00))[0]
+    return si.quad(Mintrho,0,125,args=(h,d_rho00))[0]
 
-def d_F(r,h=h_c,d_rho00=drho00_c,pref=1): #multiplying by upsylon
+pref_def = 2.352579926191481 #epsdisk*(L0/d_Mdblintrho(defaults))
+
+def d_F(r,h=h_c,d_rho00=drho00_c,pref=pref_def): #multiplying by upsylon. Generally we should either use pref or h and d
+    if pref == False:
+        pref = epsdisk*(L0/d_Mdblintrho(r,h,d_rho00))
     return 4*np.pi*G*d_outerintegral(r,h,d_rho00)*pref
 d_Fv = np.vectorize(d_F)
 
 def d_v(r,h=h_c,d_rho00=drho00_c,pref=1,save=False,load=False,**kwargs): #velocity
     if isinstance(r,float) or isinstance(r,int):
         r = np.asarray([r])
+    if isinstance(r,list):
+        r = np.asarray(r)
     if load:
         try: #Load existing prefactor if available
             y = loaddata('disk','h'+str(h)+'d_rho00'+str(d_rho00)+'pref'+str(pref),**kwargs)[1]
