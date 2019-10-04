@@ -45,7 +45,7 @@ hrho00_c = 0.31e9                 #halo central surface density (solar mass/kpc^
 drho00_c = 0.31e9                 #disk central surface density (solar mass/kpc^3)
 
 #---------Uncategorized-------------------
-re_c = 9.9                                               #effective radius (kpc)
+re_c = 2.6                                               #effective radius (kpc)
 epsdisk = 5.0                                            #from Noordermeer's paper
 rs = (1/c)*(((3*Mvir)/((4*np.pi*100*rhocrit)))**(1/3))   #scale radius (kpc)
 rho_s = (100/3)*((c**3)/(np.log(1+c)-(c/(1+c))))*rhocrit #characteristic density
@@ -333,7 +333,7 @@ def d_F(r,h=h_c,d_rho00=drho00_c,pref=pref_def): #multiplying by upsylon. Genera
         return val
 d_Fv = np.vectorize(d_F)
 
-def d_v(r,h=h_c,d_rho00=drho00_c,pref=1,save=False,load=False,**kwargs): #velocity
+def d_v(r,h=h_c,d_rho00=drho00_c,pref=pref_def,save=False,load=False,**kwargs): #velocity
     if isinstance(r,float) or isinstance(r,int):
         r = np.asarray([r])
     if isinstance(r,list):
@@ -349,10 +349,12 @@ def d_v(r,h=h_c,d_rho00=drho00_c,pref=1,save=False,load=False,**kwargs): #veloci
     if save:
         r = np.asarray(r)
         a = np.sqrt(-r*d_Fv(r,h,d_rho00,pref))
+        a[np.isnan(a)] = 0
         savedata(r,a,'disk','h'+str(h)+'d_rho00'+str(d_rho00)+'pref'+str(pref),**kwargs)
         return a
     else:
         a = np.sqrt(-r*d_Fv(r,h,d_rho00,pref))
+        a[np.isnan(a)] = 0
         return a
 
 ################################
