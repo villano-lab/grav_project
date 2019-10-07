@@ -239,7 +239,11 @@ def h_vNFW(r,save=True,**kwargs):
 def h_viso(r,rc=h_rc,rho00=hrho00_c,load=False,save=False,**kwargs):   #h_v iso
     if isinstance(r,float) or isinstance(r,int):
         r = np.asarray([r])
-    a = np.sqrt(4*np.pi*G*rho00*(rc**2)*(1-((rc/r)*np.arctan(r/rc))))
+    a = np.zeros(len(r))
+    i = 1
+    while i < len(r):
+        a[i] = np.sqrt(4*np.pi*G*rho00*(rc**2)*(1-((rc/r[i])*np.arctan(r[i]/rc))))
+        i += 1
     a[np.isnan(a)] = 0
     if load:
         try: #Load if exists
