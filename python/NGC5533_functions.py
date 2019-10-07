@@ -239,7 +239,11 @@ def h_vNFW(r,save=True,**kwargs):
 def h_viso(r,rc=h_rc,rho00=hrho00_c,load=False,save=False,**kwargs):   #h_v iso
     if isinstance(r,float) or isinstance(r,int):
         r = np.asarray([r])
-    a = np.sqrt(4*np.pi*G*rho00*(rc**2)*(1-((rc/r)*np.arctan(r/rc))))
+    a = np.zeros(len(r))
+    i = 1
+    while i < len(r):
+        a[i] = np.sqrt(4*np.pi*G*rho00*(rc**2)*(1-((rc/r[i])*np.arctan(r[i]/rc))))
+        i += 1
     a[np.isnan(a)] = 0
     if load:
         try: #Load if exists
@@ -325,7 +329,7 @@ pref_def = 2.352579926191481 #epsdisk*(L0/d_Mdblintrho(defaults))
 
 def d_F(r,h=h_c,d_rho00=drho00_c,pref=pref_def): #multiplying by upsylon. Generally we should either use pref or h and d
     if pref == False:
-        pref = epsdisk*(L0/d_Mdblintrho(r,h,d_rho00))
+        pref = epsdisk*(L0/d_Mdblintrho(h,d_rho00))
     val = 4*np.pi*G*d_outerintegral(r,h,d_rho00)*pref
     if np.isnan(val):
         return 0
