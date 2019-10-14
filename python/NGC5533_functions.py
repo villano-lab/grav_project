@@ -327,7 +327,7 @@ def d_Mdblintrho(h=h_c,d_rho00=drho00_c):    #M double-integral rho
 
 pref_def = 2.352579926191481 #epsdisk*(L0/d_Mdblintrho(defaults))
 
-def d_F(r,h=h_c,d_rho00=drho00_c,pref=pref_def): #multiplying by upsylon. Generally we should either use pref or h and d
+def d_F(r,h=h_c,d_rho00=drho00_c,pref=1): #multiplying by upsylon. Generally we should either use pref or h and d
     if pref == False:
         pref = epsdisk*(L0/d_Mdblintrho(h,d_rho00))
     val = 4*np.pi*G*d_outerintegral(r,h,d_rho00)*pref
