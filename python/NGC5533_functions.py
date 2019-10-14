@@ -76,7 +76,7 @@ def savedata(xvalues,yvalues,group,dataset,path='./',file='Inputs.hdf5'):
         try:
             grp = saved.create_group(group)
             grp.create_dataset(dataset,data=[xvalues,yvalues])
-        except:
+        except KeyError:
             try:
                 grp = saved[group]
                 grp.create_dataset(dataset,data=[xvalues,yvalues])
