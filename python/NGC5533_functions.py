@@ -76,7 +76,7 @@ def savedata(xvalues,yvalues,group,dataset,path='./',file='Inputs.hdf5'):
         try:
             grp = saved.create_group(group)
             grp.create_dataset(dataset,data=[xvalues,yvalues])
-        except KeyError:
+        except ValueError:
             try:
                 grp = saved[group]
                 grp.create_dataset(dataset,data=[xvalues,yvalues])
@@ -318,7 +318,7 @@ def d_innerintegral(u,r,h=h_c,d_rho00=drho00_c): #Integrate Function
 #Args passed into quad need to be numbers, not arrays. (?)
 
 def d_outerintegral(r,h=h_c,d_rho00=drho00_c): #Integrate Outer Function
-    return si.quad(d_innerintegral, 0.1, 125, args=(r,h,d_rho00))[0]
+    return si.quad(d_innerintegral, 1, 125, args=(r,h,d_rho00))[0]
 
 def d_Mdblintrho(h=h_c,d_rho00=drho00_c):    #M double-integral rho
     rho_rz_r = lambda z,r,h,d_rho00: d_rho_rz(r,z,h,d_rho00)*r
