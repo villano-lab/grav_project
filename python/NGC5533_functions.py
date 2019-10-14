@@ -337,7 +337,7 @@ def d_F(r,h=h_c,d_rho00=drho00_c,pref=1): #multiplying by upsylon. Generally we 
         return val
 d_Fv = np.vectorize(d_F)
 
-def d_v(r,h=h_c,d_rho00=drho00_c,pref=pref_def,save=False,load=False,**kwargs): #velocity
+def d_v(r,h=h_c,d_rho00=drho00_c,pref=1,save=False,load=False,**kwargs): #velocity
     if isinstance(r,float) or isinstance(r,int):
         r = np.asarray([r])
     if isinstance(r,list):
