@@ -9,4 +9,4 @@ for k in x:
         #calculate and save the disk and bulge values.
         nf.d_v(rdat,k,j,save=True,path='../fitting')
         nf.b_v(rdat,k,j,save=True,path='../fitting')
-        print(str(j)+':'+str(k)+' (maximum = 20:20)', end='')
+        print(str(j)+':'+str(k)+' (maximum = 20:20)  ', end='', flush=True)
