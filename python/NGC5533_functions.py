@@ -305,7 +305,10 @@ def d_durho0(r, h=h_c, d_rho00=drho00_c): #partial derivative of rho(u,xi)
 def d_rho_rz(r,z,h=h_c,d_rho00=drho00_c):
     return d_rho0(r, h, d_rho00)*np.power(np.cosh(z/z0(h)), -2)
 def d_drho_rz(r,z,h=h_c,d_rho00=drho00_c):
-    return d_durho0(r, h, d_rho00)*np.power(np.cosh(z/z0(h)), -2)
+    try:
+        return d_durho0(r, h, d_rho00)*np.power(np.cosh(z/z0(h)), -2)
+    except ZeroDivisionError:
+        return nan
 
 def d_K(r,u,xi): #Complete Elliptic Integral
     return 2*(ss.ellipk(d_px(r,u,xi)) - ss.ellipe(d_px(r,u,xi)))/(np.pi*np.sqrt(r*u*d_px(r,u,xi)))
@@ -318,7 +321,7 @@ def d_innerintegral(u,r,h=h_c,d_rho00=drho00_c): #Integrate Function
 #Args passed into quad need to be numbers, not arrays. (?)
 
 def d_outerintegral(r,h=h_c,d_rho00=drho00_c): #Integrate Outer Function
-    return si.quad(d_innerintegral, 1, 125, args=(r,h,d_rho00))[0]
+    return si.quad(d_innerintegral, 0, np.inf, args=(r,h,d_rho00))[0]
 
 def d_Mdblintrho(h=h_c,d_rho00=drho00_c):    #M double-integral rho
     rho_rz_r = lambda z,r,h,d_rho00: d_rho_rz(r,z,h,d_rho00)*r
@@ -349,7 +352,13 @@ def d_v(r,h=h_c,d_rho00=drho00_c,pref=1,save=False,load=False,**kwargs): #veloci
             b = inter.InterpolatedUnivariateSpline(x,y,k=3) #k is the order of the polynomial
             return b(r)
         except KeyError: #If unable to load, load 1 instead and apply a prefactor retroactively
-            save = True
+            try:
+                y = pref*loaddata('disk','h'+str(h)+'d_rho00'+str(d_rho00)+'pref1',**kwargs)[1]
+                x = loaddata('disk','h'+str(h)+'d_rho00'+str(d_rho00)+'pref1',**kwargs)[1]
+                b = inter.InterpolatedUnivariateSpline(x,y,k=3) #k is the order of the polynomial
+                return b(r)
+            except KeyError: #And if still unable to load, calculate and save.
+                save = True
     if save:
         r = np.asarray(r)
         a = np.sqrt(-r*d_Fv(r,h,d_rho00,pref))
