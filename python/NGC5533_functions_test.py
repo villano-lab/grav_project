@@ -45,7 +45,7 @@ hrho00_c = 0.31e9                 #halo central surface density (solar mass/kpc^
 drho00_c = 0.31e9                 #disk central surface density (solar mass/kpc^3)
 
 #---------Uncategorized-------------------
-re_c = 9.9                                               #effective radius (kpc)
+re_c = 2.6                                               #effective radius (kpc)
 epsdisk = 5.0                                            #from Noordermeer's paper
 rs = (1/c)*(((3*Mvir)/((4*np.pi*100*rhocrit)))**(1/3))   #scale radius (kpc)
 rho_s = (100/3)*((c**3)/(np.log(1+c)-(c/(1+c))))*rhocrit #characteristic density
@@ -76,7 +76,7 @@ def savedata(xvalues,yvalues,group,dataset,path='./',file='Inputs.hdf5'):
         try:
             grp = saved.create_group(group)
             grp.create_dataset(dataset,data=[xvalues,yvalues])
-        except:
+        except ValueError:
             try:
                 grp = saved[group]
                 grp.create_dataset(dataset,data=[xvalues,yvalues])
@@ -126,7 +126,7 @@ def loaddata(group,dataset,path='./',file='Inputs.hdf5'):
         return a
         saved.close()
     #Placeholder; I will design this to store information at a later date.
-    if h5py ==0:
+    if h5py == 0:
         print("ERROR: h5py was not loaded.")
         return 1
 
@@ -239,7 +239,11 @@ def h_vNFW(r,save=True,**kwargs):
 def h_viso(r,rc=h_rc,rho00=hrho00_c,load=False,save=False,**kwargs):   #h_v iso
     if isinstance(r,float) or isinstance(r,int):
         r = np.asarray([r])
-    a = np.sqrt(4*np.pi*G*rho00*(rc**2)*(1-((rc/r)*np.arctan(r/rc))))
+    a = np.zeros(len(r))
+    i = 1
+    while i < len(r):
+        a[i] = np.sqrt(4*np.pi*G*rho00*(rc**2)*(1-((rc/r[i])*np.arctan(r[i]/rc))))
+        i += 1
     a[np.isnan(a)] = 0
     if load:
         try: #Load if exists
@@ -277,7 +281,7 @@ def d_px(r,u,xi):       #Initial Function
     try:
         return x(r,u,xi)-(np.sqrt(x(r,u,xi)**2-1))
     except ZeroDivisionError: #If dividing by zero, return infinity instead of error. (Mostly at 0)
-        return np.inf
+        return np.nan
 
 def d_rho0(r, h=h_c, d_rho00=drho00_c): #density piecewise function
     conditions = [r <= R(h),
@@ -301,50 +305,46 @@ def d_durho0(r, h=h_c, d_rho00=drho00_c): #partial derivative of rho(u,xi)
 def d_rho_rz(r,z,h=h_c,d_rho00=drho00_c):
     return d_rho0(r, h, d_rho00)*np.power(np.cosh(z/z0(h)), -2)
 def d_drho_rz(r,z,h=h_c,d_rho00=drho00_c):
-    return d_durho0(r, h, d_rho00)*np.power(np.cosh(z/z0(h)), -2)
+    try:
+        return d_durho0(r, h, d_rho00)*np.power(np.cosh(z/z0(h)), -2)
+    except ZeroDivisionError:
+        return nan
 
 def d_K(r,u,xi): #Complete Elliptic Integral
     return 2*(ss.ellipk(d_px(r,u,xi)) - ss.ellipe(d_px(r,u,xi)))/(np.pi*np.sqrt(r*u*d_px(r,u,xi)))
 
-#def d_innerfunc(z,r,u,h=h_c,d_rho00=drho00_c):  #Inner Function (3D)
-#    return d_drho_rz(u, z, h, d_rho00)*d_K(r,u,z)
+def d_innerfunc(z,r,u,h=h_c,d_rho00=drho00_c):  #Inner Function (3D)
+    return d_drho_rz(u, z, h, d_rho00)*d_K(r,u,z)
 
-def d_innerfunc(r,u,z,h=h_c,d_rho00=drho00_c):  #Inner Function (3D)
-    return u*d_drho_rz(u,z,h,d_rho00)*d_K(r,u,z)
-
-#adding
-def d_innerfunc2(z,r,u,h=h_c,d_rho00=drho00_c):
-    switchvariables = lambda z,r,u,h=h_c,d_rho00=drho00_c: d_innerfunc(r,u,z,h=h_c,d_rho00=drho00_c) 
-    return switchvariables(z,r,u,h=h_c,d_rho00=drho00_c)
-
-#def d_innerintegral(u,r,h=h_c,d_rho00=drho00_c): #Integrate Function
-#    return u*si.quad(d_innerfunc, 0.1, 125, args=(r,u,h,d_rho00))[0]
+def d_innerintegral(u,r,h=h_c,d_rho00=drho00_c): #Integrate Function
+    return u*si.quad(d_innerfunc, 0, np.inf, args=(r,u,h,d_rho00))[0]
 #Args passed into quad need to be numbers, not arrays. (?)
 
-def d_innerintegral(r,u,h=h_c,d_rho00=drho00_c): #Integrate Function 
-    return si.quad(d_innerfunc2, 0, np.inf, args=(r,u,h,d_rho00))[0]
-
-#adding
-def d_innerintegral2(u,r,h=h_c,d_rho00=drho00_c):
-    switchvariables = lambda u,r,h=h_c,d_rho00=drho00_c: d_innerintegral(r,u,h=h_c,d_rho00=drho00_c)
-    return switchvariables(u,r,h=h_c,d_rho00=drho00_c)
-
 def d_outerintegral(r,h=h_c,d_rho00=drho00_c): #Integrate Outer Function
-    return si.quad(d_innerintegral2, 0.1, 125, args=(r,h,d_rho00))[0]
+    return si.quad(d_innerintegral, 0, np.inf, args=(r,h,d_rho00))[0]
 
-#def d_Mdblintrho(r,h=h_c,d_rho00=drho00_c):    #M double-integral rho
-#    rho_rz_r = lambda z,r,h,d_rho00: d_rho_rz(r,z,h,d_rho00)*r
-#    Mintrho = lambda r,h,d_rho00: si.quad(rho_rz_r, -125, 125, args=(r,h,d_rho00))[0]
-#    return si.quad(d_Mintrho,0,125,args=(h,d_rho00))[0]
-#This is never called
+def d_Mdblintrho(h=h_c,d_rho00=drho00_c):    #M double-integral rho
+    rho_rz_r = lambda z,r,h,d_rho00: d_rho_rz(r,z,h,d_rho00)*r
+    Mintrho = lambda r,h,d_rho00: si.quad(rho_rz_r, -125, 125, args=(r,h,d_rho00))[0]
+    return si.quad(Mintrho,0,125,args=(h,d_rho00))[0]
 
-def d_F(r,h=h_c,d_rho00=drho00_c,pref=1): #multiplying by upsylon
-    return 4*np.pi*G*d_outerintegral(r,h,d_rho00)*pref
+pref_def = 2.352579926191481 #epsdisk*(L0/d_Mdblintrho(defaults))
+
+def d_F(r,h=h_c,d_rho00=drho00_c,pref=1): #multiplying by upsylon. Generally we should either use pref or h and d
+    if pref == False:
+        pref = epsdisk*(L0/d_Mdblintrho(h,d_rho00))
+    val = 4*np.pi*G*d_outerintegral(r,h,d_rho00)*pref
+    if np.isnan(val):
+        return 0
+    else:
+        return val
 d_Fv = np.vectorize(d_F)
 
 def d_v(r,h=h_c,d_rho00=drho00_c,pref=1,save=False,load=False,**kwargs): #velocity
     if isinstance(r,float) or isinstance(r,int):
         r = np.asarray([r])
+    if isinstance(r,list):
+        r = np.asarray(r)
     if load:
         try: #Load existing prefactor if available
             y = loaddata('disk','h'+str(h)+'d_rho00'+str(d_rho00)+'pref'+str(pref),**kwargs)[1]
@@ -352,14 +352,22 @@ def d_v(r,h=h_c,d_rho00=drho00_c,pref=1,save=False,load=False,**kwargs): #veloci
             b = inter.InterpolatedUnivariateSpline(x,y,k=3) #k is the order of the polynomial
             return b(r)
         except KeyError: #If unable to load, load 1 instead and apply a prefactor retroactively
-            save = True
+            try:
+                y = pref*loaddata('disk','h'+str(h)+'d_rho00'+str(d_rho00)+'pref1',**kwargs)[1]
+                x = loaddata('disk','h'+str(h)+'d_rho00'+str(d_rho00)+'pref1',**kwargs)[1]
+                b = inter.InterpolatedUnivariateSpline(x,y,k=3) #k is the order of the polynomial
+                return b(r)
+            except KeyError: #And if still unable to load, calculate and save.
+                save = True
     if save:
         r = np.asarray(r)
         a = np.sqrt(-r*d_Fv(r,h,d_rho00,pref))
+        a[np.isnan(a)] = 0
         savedata(r,a,'disk','h'+str(h)+'d_rho00'+str(d_rho00)+'pref'+str(pref),**kwargs)
         return a
     else:
         a = np.sqrt(-r*d_Fv(r,h,d_rho00,pref))
+        a[np.isnan(a)] = 0
         return a
 
 ################################
