@@ -351,7 +351,7 @@ def d_v(r,h=h_c,d_rho00=drho00_c,pref=1,save=False,load=False,**kwargs): #veloci
             x = loaddata('disk','h'+str(h)+'d_rho00'+str(d_rho00)+'pref'+str(pref),**kwargs)[0]
             b = inter.InterpolatedUnivariateSpline(x,y,k=3) #k is the order of the polynomial
             return b(r)
-            else:
+        else:
                 save = True
         except KeyError: #If unable to load, load 1 instead and apply a prefactor retroactively
             try:
@@ -392,6 +392,8 @@ def v(r,M=Mbh_def,re=re_c,h=h_c,d_rho00=drho00_c,pref=1,rc=h_rc,h_rho00=hrho00_c
             return b(r)
         except KeyError: #If does not exist,
             save = True  #Save instead
+        except error: #Attempting to catch problem with spline having too few points
+            save = True #Calculate since there aren't enough points
     if save: #not elif since that would mean don't check if load was true, which I don't want in this case
         savedata(r,a,'total','Mbh'+str(M)+'re'+str(re)+'h'+str(h)+'d_rho00'+str(d_rho00)+'pref'+str(pref) +'rc'+str(rc)+'h_rho00'+str(h_rho00),**kwargs)
         return a
