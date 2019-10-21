@@ -96,7 +96,8 @@ def savedata(xvalues,yvalues,group,dataset,path='./',file='Inputs.hdf5'):
                 del grp[dataset]
                 savedata(x,y,group,dataset,path,file)
                 return y
-        saved.close()
+        finally: #No matter what,
+            saved.close()
         #print("Saved.") #Convenient for debugging but annoying for fitting.
     if h5py == 0:
         print("ERROR: h5py was not loaded.")
@@ -124,6 +125,7 @@ def loaddata(group,dataset,path='./',file='Inputs.hdf5'):
         dset = grp[dataset]
         a = dset[:]
         return a
+    finally:
         saved.close()
     #Placeholder; I will design this to store information at a later date.
     if h5py == 0:
@@ -152,6 +154,12 @@ def bh_v(r,M=Mbh_def,save=False,load=False,**kwargs): #M in solar masses, r in k
             x = loaddata('blackhole','Mbh1',**kwargs)[0]
         spline = inter.InterpolatedUnivariateSpline(x,y,k=3) #k is the order of the polynomial
         return spline(r)
+        except: #Attempting to catch problem with spline having too few points
+            print('An error has occured. Switching to save function. Error information below:')
+            print(sys.exc_info()[0])
+            print(sys.exc_info()[1])
+            print(sys.exc_info()[2])
+            save = True #Calculate since there aren't enough points
     else:
         return a
     
@@ -195,6 +203,12 @@ def b_v(r,n=n_c,re=re_c,save=False,load=False,**kwargs):
             return b(r)
         except KeyError: #if does not exist,
             save = True  #go to save function instead
+        except: #Attempting to catch problem with spline having too few points
+            print('An error has occured. Switching to save function. Error information below:')
+            print(sys.exc_info()[0])
+            print(sys.exc_info()[1])
+            print(sys.exc_info()[2])
+            save = True #Calculate since there aren't enough points
     a = b_vsquarev(r,n,re)**(1/2)
     a[np.isnan(a)] = 0
     if save:
@@ -253,6 +267,12 @@ def h_viso(r,rc=h_rc,rho00=hrho00_c,load=False,save=False,**kwargs):   #h_v iso
             return b(r)
         except KeyError: #If does not exist,
             save = True #Calculate and save
+        except: #Attempting to catch problem with spline having too few points
+            print('An error has occured. Switching to save function. Error information below:')
+            print(sys.exc_info()[0])
+            print(sys.exc_info()[1])
+            print(sys.exc_info()[2])
+            save = True #Calculate since there aren't enough points
     if save:
         savedata(r,a,'halo','rc'+str(rc)+'rho00'+str(rho00),**kwargs)
         return a
@@ -362,6 +382,10 @@ def d_v(r,h=h_c,d_rho00=drho00_c,pref=1,save=False,load=False,**kwargs): #veloci
             except KeyError: #And if still unable to load, calculate and save.
                 save = True
         except: #Attempting to catch problem with spline having too few points
+            print('An error has occured. Switching to save function. Error information below:')
+            print(sys.exc_info()[0])
+            print(sys.exc_info()[1])
+            print(sys.exc_info()[2])
             save = True #Calculate since there aren't enough points
     if save:
         r = np.asarray(r)
@@ -391,6 +415,10 @@ def v(r,M=Mbh_def,re=re_c,h=h_c,d_rho00=drho00_c,pref=1,rc=h_rc,h_rho00=hrho00_c
         except KeyError: #If does not exist,
             save = True  #Save instead
         except: #Attempting to catch problem with spline having too few points
+            print('An error has occured. Switching to save function. Error information below:')
+            print(sys.exc_info()[0])
+            print(sys.exc_info()[1])
+            print(sys.exc_info()[2])
             save = True #Calculate since there aren't enough points
     if save: #not elif since that would mean don't check if load was true, which I don't want in this case
         savedata(r,a,'total','Mbh'+str(M)+'re'+str(re)+'h'+str(h)+'d_rho00'+str(d_rho00)+'pref'+str(pref) +'rc'+str(rc)+'h_rho00'+str(h_rho00),**kwargs)
