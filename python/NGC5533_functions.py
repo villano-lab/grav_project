@@ -361,7 +361,7 @@ def d_v(r,h=h_c,d_rho00=drho00_c,pref=1,save=False,load=False,**kwargs): #veloci
                 return b(r)
             except KeyError: #And if still unable to load, calculate and save.
                 save = True
-        except error: #Attempting to catch problem with spline having too few points
+        except: #Attempting to catch problem with spline having too few points
             save = True #Calculate since there aren't enough points
     if save:
         r = np.asarray(r)
@@ -390,7 +390,7 @@ def v(r,M=Mbh_def,re=re_c,h=h_c,d_rho00=drho00_c,pref=1,rc=h_rc,h_rho00=hrho00_c
             return b(r)
         except KeyError: #If does not exist,
             save = True  #Save instead
-        except error: #Attempting to catch problem with spline having too few points
+        except: #Attempting to catch problem with spline having too few points
             save = True #Calculate since there aren't enough points
     if save: #not elif since that would mean don't check if load was true, which I don't want in this case
         savedata(r,a,'total','Mbh'+str(M)+'re'+str(re)+'h'+str(h)+'d_rho00'+str(d_rho00)+'pref'+str(pref) +'rc'+str(rc)+'h_rho00'+str(h_rho00),**kwargs)
