@@ -96,8 +96,8 @@ def savedata(xvalues,yvalues,group,dataset,path='./',file='Inputs.hdf5'):
                 del grp[dataset]
                 savedata(x,y,group,dataset,path,file)
                 return y
-        finally: #No matter what,
-            saved.close()
+            finally: #No matter what,
+                saved.close()
         #print("Saved.") #Convenient for debugging but annoying for fitting.
     if h5py == 0:
         print("ERROR: h5py was not loaded.")
@@ -125,8 +125,8 @@ def loaddata(group,dataset,path='./',file='Inputs.hdf5'):
         dset = grp[dataset]
         a = dset[:]
         return a
-    finally:
-        saved.close()
+        finally:
+            saved.close()
     #Placeholder; I will design this to store information at a later date.
     if h5py == 0:
         print("ERROR: h5py was not loaded.")
