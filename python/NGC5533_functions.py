@@ -351,8 +351,6 @@ def d_v(r,h=h_c,d_rho00=drho00_c,pref=1,save=False,load=False,**kwargs): #veloci
             x = loaddata('disk','h'+str(h)+'d_rho00'+str(d_rho00)+'pref'+str(pref),**kwargs)[0]
             b = inter.InterpolatedUnivariateSpline(x,y,k=3) #k is the order of the polynomial
             return b(r)
-        else:
-                save = True
         except KeyError: #If unable to load, load 1 instead and apply a prefactor retroactively
             try:
                 y = pref*loaddata('disk','h'+str(h)+'d_rho00'+str(d_rho00)+'pref1',**kwargs)[1]
