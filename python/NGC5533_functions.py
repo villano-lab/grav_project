@@ -57,7 +57,7 @@ h_gamma = 0
 
 def savedata(xvalues,yvalues,group,dataset,path='./',file='Inputs.hdf5'):
     if h5py == 1:
-        saved = h5.File(path+file,'a')
+        saved = h5.File(path+'/'+file,'a')
         if group in ['Disk', 'disc', 'Disc',  'd', 'D']:
             group = 'disk'
             print("Group name set to 'disk'.")
@@ -99,13 +99,13 @@ def savedata(xvalues,yvalues,group,dataset,path='./',file='Inputs.hdf5'):
             finally: #No matter what,
                 saved.close()
         #print("Saved.") #Convenient for debugging but annoying for fitting.
-    if h5py == 0:
+    elif h5py == 0:
         print("ERROR: h5py was not loaded.")
         return 1
     
 def loaddata(group,dataset,path='./',file='Inputs.hdf5'):
     if h5py == 1:
-        saved = h5.File(path+file)
+        saved = h5.File(path+'/'+file)
         if group in ['Disk', 'disc', 'Disc', 'd', 'D']:
             group = 'disk'
             print("Group name set to 'disk'.")
@@ -125,10 +125,34 @@ def loaddata(group,dataset,path='./',file='Inputs.hdf5'):
         dset = grp[dataset]
         a = dset[:]
         return a
-        finally:
-            saved.close()
     #Placeholder; I will design this to store information at a later date.
-    if h5py == 0:
+    elif h5py == 0:
+        print("ERROR: h5py was not loaded.")
+        return 1
+    
+def checkfile(group='all',path='./',file='Inputs.hdf5'):
+    if h5py ==1:
+        saved = h5.File(path+'/'+file,'r')
+        if group == 'all':
+            print('Groups:')
+            for n in saved:
+                print(saved[n])
+            print('')
+            print(' ---------------- ')
+            print('')
+            print('More information:')
+            for n in saved:
+                grp = saved[n]
+                print(grp)
+                for m in grp:
+                    print('        '+str(grp[m]))
+        else:
+            print(group+':')
+            grp = saved[group]
+            for n in grp:
+                print(grp[n])
+        saved.close()
+    elif h5py ==0:
         print("ERROR: h5py was not loaded.")
         return 1
 
@@ -152,8 +176,8 @@ def bh_v(r,M=Mbh_def,save=False,load=False,**kwargs): #M in solar masses, r in k
         except KeyError: #If unable to load, load default instead and apply a prefactor retroactively
             y = np.sqrt(M)*loaddata('blackhole','Mbh1',**kwargs)[1]
             x = loaddata('blackhole','Mbh1',**kwargs)[0]
-        spline = inter.InterpolatedUnivariateSpline(x,y,k=3) #k is the order of the polynomial
-        return spline(r)
+            spline = inter.InterpolatedUnivariateSpline(x,y,k=3) #k is the order of the polynomial
+            return spline(r)
         except: #Attempting to catch problem with spline having too few points
             print('An error has occured. Switching to save function. Error information below:')
             print(sys.exc_info()[0])
