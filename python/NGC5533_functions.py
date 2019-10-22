@@ -166,10 +166,7 @@ def bh_v(r,M=Mbh_def,save=False,load=False,**kwargs): #M in solar masses, r in k
     if isinstance(r,list):
         r = np.asarray(r)
     a = np.sqrt(G*M/r)
-    if save:
-        savedata(r,a,'blackhole','Mbh'+str(M),**kwargs)
-        return a
-    elif load:
+    if load:
         try: #Load existing prefactor if available
             y = loaddata('blackhole','Mbh'+str(M),**kwargs)[1]
             x = loaddata('blackhole','Mbh'+str(M),**kwargs)[0]
@@ -184,6 +181,9 @@ def bh_v(r,M=Mbh_def,save=False,load=False,**kwargs): #M in solar masses, r in k
             print(sys.exc_info()[1])
             print(sys.exc_info()[2])
             save = True #Calculate since there aren't enough points
+    if save:
+        savedata(r,a,'blackhole','Mbh'+str(M),**kwargs)
+        return a
     else:
         return a
     
