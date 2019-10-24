@@ -13,6 +13,7 @@ def _exec_notebook(path):
 
 def test():
     print('Testing Jupyter notebooks...')
+    _exec_notebook('../fitting/Static_Notebooks/*')
     _exec_notebook('BlackHole_Velocity.ipynb')
     _exec_notebook('Bulge_RotationCurve_n2_7.ipynb')
     _exec_notebook('Disk_Velocity_kpc.ipynb')
