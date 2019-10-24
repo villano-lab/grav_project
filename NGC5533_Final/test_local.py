@@ -1,6 +1,6 @@
 import subprocess
 import tempfile
-
+import os
 
 def _exec_notebook(path):
     with tempfile.NamedTemporaryFile(suffix=".ipynb") as fout:
