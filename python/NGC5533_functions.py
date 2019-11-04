@@ -161,7 +161,7 @@ def checkfile(group='all',path='./',file='Inputs.hdf5'):
 ######### Black Hole ###########
 ################################
 
-def bh_v(r,M=Mbh_def,save=False,load=False,grp='blackhole',**kwargs): #M in solar masses, r in kpc
+def bh_v(r,M=Mbh_def,save=False,load=True,grp='blackhole',**kwargs): #M in solar masses, r in kpc
     if isinstance(r,float) or isinstance(r,int):
         r = np.asarray([r])
     if isinstance(r,list):
@@ -217,7 +217,7 @@ def b_vsquarev(r,n=n_c,re=re_c):
     a = np.vectorize(b_vsquare)
     return a(r,n,re)
 
-def b_v(r,n=n_c,re=re_c,save=False,load=False,grp='bulge',**kwargs):
+def b_v(r,n=n_c,re=re_c,save=False,load=True,grp='bulge',**kwargs):
     if isinstance(r,float) or isinstance(r,int):
         r = np.asarray([r])
     if load:
@@ -275,7 +275,7 @@ def h_vNFW(r,save=True,**kwargs):
     else:
         return a(r)
 
-def h_viso(r,rc=h_rc,rho00=hrho00_c,load=False,save=False,grp='halo',**kwargs):   #h_v iso
+def h_viso(r,rc=h_rc,rho00=hrho00_c,load=True,save=False,grp='halo',**kwargs):   #h_v iso
     if isinstance(r,float) or isinstance(r,int):
         r = np.asarray([r])
     a = np.zeros(len(r))
@@ -385,7 +385,7 @@ def d_F(r,h=h_c,d_rho00=drho00_c,pref=1): #multiplying by upsylon. Generally we 
         return val
 d_Fv = np.vectorize(d_F)
 
-def d_v(r,h=h_c,d_rho00=drho00_c,pref=1,save=False,load=False,grp='disk',**kwargs): #velocity
+def d_v(r,h=h_c,d_rho00=drho00_c,pref=1,save=False,load=True,grp='disk',**kwargs): #velocity
     if isinstance(r,float) or isinstance(r,int):
         r = np.asarray([r])
     if isinstance(r,list):
@@ -424,7 +424,7 @@ def d_v(r,h=h_c,d_rho00=drho00_c,pref=1,save=False,load=False,grp='disk',**kwarg
 ################################
 ############ Total #############
 ################################
-def v(r,M=Mbh_def,re=re_c,h=h_c,d_rho00=drho00_c,pref=1,rc=h_rc,h_rho00=hrho00_c,save=False,load=False,grp='total',**kwargs): 
+def v(r,M=Mbh_def,re=re_c,h=h_c,d_rho00=drho00_c,pref=1,rc=h_rc,h_rho00=hrho00_c,save=False,load=True,grp='total',**kwargs): 
     if isinstance(r,float) or isinstance(r,int):
         r = np.asarray([r])
     a = np.sqrt(np.sqrt(h_v(r,rc,h_rho00)**2+d_v(r,h,d_rho00,pref)**2+bh_v(r,M)**2+b_v(r,re)**2))
