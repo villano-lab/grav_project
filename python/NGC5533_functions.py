@@ -286,7 +286,11 @@ def h_viso(r,rc=h_rc,rho00=hrho00_c,load=True,save=False,comp='halo',**kwargs): 
     a = np.zeros(len(r))
     i = 1
     while i < len(r):
-        a[i] = np.sqrt(4*np.pi*G*rho00*(rc**2)*(1-((rc/r[i])*np.arctan(r[i]/rc))))
+        a[i] = np.sqrt(
+            4*np.pi*G*rho00*(rc**2)*(1-(
+                (rc/r[i])*np.arctan(r[i]/rc))
+                                    )
+        )
         i += 1
     a[np.isnan(a)] = 0
     if load:
@@ -403,7 +407,7 @@ def d_v(r,h=h_c,d_rho00=drho00_c,pref=1,save=False,load=True,comp='disk',**kwarg
             return b(r)
         except KeyError: #If unable to load, load 1 instead and apply a prefactor retroactively
             try:
-                y = pref*loaddata(comp,'h'+str(h)+'d_rho00'+str(d_rho00)+'pref1',comp=group,file=comp+'.hdf5',**kwargs)[1]
+                y = pref*loaddata(comp,'h'+str(h)+'d_rho00'+str(d_rho00)+'pref1',file=comp+'.hdf5',**kwargs)[1]
                 x = loaddata(comp,'h'+str(h)+'d_rho00'+str(d_rho00)+'pref1',file=comp+'.hdf5',**kwargs)[0]
                 b = inter.InterpolatedUnivariateSpline(x,y,k=3) #k is the order of the polynomial
                 return b(r)
@@ -432,8 +436,6 @@ def d_v(r,h=h_c,d_rho00=drho00_c,pref=1,save=False,load=True,comp='disk',**kwarg
 def v(r,M=Mbh_def,re=re_c,h=h_c,d_rho00=drho00_c,pref=1,rc=h_rc,h_rho00=hrho00_c,save=False,load=True,comp='total',**kwargs): 
     if isinstance(r,float) or isinstance(r,int):
         r = np.asarray([r])
-    a = np.sqrt(np.sqrt(h_v(r,rc,h_rho00)**2+d_v(r,h,d_rho00,pref)**2+bh_v(r,M)**2+b_v(r,re)**2))
-    a[np.isnan(a)] = 0
     if load:
         try: #Load if exists
             y = loaddata(comp,'Mbh'+str(M)+'re'+str(re)+'h'+str(h)+'d_rho00'+str(d_rho00)+'pref'+str(pref) +'rc'+str(rc)+'h_rho00'+str(h_rho00), file=comp+'.hdf5',**kwargs)[1]
@@ -448,6 +450,8 @@ def v(r,M=Mbh_def,re=re_c,h=h_c,d_rho00=drho00_c,pref=1,rc=h_rc,h_rho00=hrho00_c
             print(sys.exc_info()[1])
             print(sys.exc_info()[2])
             save = True #Calculate since there aren't enough points
+    a = np.sqrt(np.sqrt(h_v(r,rc,h_rho00,load,save)**2+d_v(r,h,d_rho00,pref,load,save)**2+bh_v(r,M,load,save)**2+b_v(r,re,load,save)**2))
+    a[np.isnan(a)] = 0
     if save: #not elif since that would mean don't check if load was true, which I don't want in this case
         savedata(r,a,comp,'Mbh'+str(M)+'re'+str(re)+'h'+str(h)+'d_rho00'+str(d_rho00)+'pref'+str(pref) +'rc'+str(rc)+'h_rho00'+str(h_rho00),file=comp+'.hdf5',**kwargs)
         return a
