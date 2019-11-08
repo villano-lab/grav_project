@@ -168,6 +168,8 @@ def bh_v(r,M=Mbh_def,save=False,load=True,comp='blackhole',**kwargs): #M in sola
     if isinstance(r,list):
         r = np.asarray(r)
     a = np.sqrt(G*M/r)
+    if save:
+        load = False
     if load:
         try: #Load existing prefactor if available
             #file = comp+'.hdf5'
@@ -262,7 +264,7 @@ def h_vcasertano(r,z,rc=h_rc,rho00=hrho00_c,gamma=h_gamma):                     
 def h_vjimenez(r,rc=h_rc,rho00=hrho00_c):
     return np.sqrt(4*np.pi*G*rho00*(rc**2)*(1-((rc/r)*np.arctan(r/rc))))
 
-def h_vNFW(r,save=True,**kwargs):
+def h_vNFW(r,save=True,comp='hNFW',**kwargs):
     rho = lambda r: rho_s/((r/rs)*((1+r/rs)**2))
     f = lambda R: 4*np.pi*rho(R)*(R**2)          #NFW Density Profile
     mdm = lambda r: si.quad(f, 0, r)[0]          #M(r)
