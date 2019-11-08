@@ -18,6 +18,7 @@ def test():
     _exec_notebook('../fitting/Static_Notebooks/Fitting-BlackHole.ipynb')
     _exec_notebook('../fitting/Static_Notebooks/Fitting-Halo.ipynb')
     _exec_notebook('../fitting/Static_Notebooks/Fitting-Bulge.ipynb')
+    _exec_notebook('../fitting/Static_Notebooks/Fitting-Disk.ipynb')
     _exec_notebook('BlackHole_Velocity.ipynb')
     _exec_notebook('Bulge_RotationCurve_n2_7.ipynb')
     _exec_notebook('Disk_Velocity_kpc.ipynb')

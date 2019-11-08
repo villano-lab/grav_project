@@ -37,9 +37,8 @@ If you want to use a different structure, kwargs for the `savedata` and `loaddat
 The `savedata` and `loaddata` functions use h5py to read and write to .hdf5 files.
 Functions which save or load data have defaults set to use the expected structure for ease of use.
 This is as follows:
-- The file used for storing calculations is in the current directory.
-- The name of this file is 'Inputs.hdf5'
-- Each velocity component has its own group ('disk', 'bulge', 'halo', 'blackhole')
-    - a group name that is similar to one of these group names will be redirected to the expected name.
-- Within that group, each unique set of parameters will be a single dataset
+- The file used for storing calculations is in the current directory. You can change this with the `path` variable.
+- The name of this file is based on the component ('total.hdf5','disk.hdf5','bulge.hdf5','blackhole.hdf5').
+- Currently, each file has only one group with the same name (without the hdf5) due to file size limitations
+- Within that file and group, each unique set of parameters will be a single dataset
 - Each dataset will contain two numpy arrays, the zeroth corresponding to x-data and the first corresponding to calculated y-values
