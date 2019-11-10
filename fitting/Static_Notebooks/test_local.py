@@ -13,7 +13,7 @@ def _exec_notebook(path):
 
 def test():
     print('Testing Jupyter notebooks...')
-    _exec_notebook('../fitting/Static_Notebooks/Fitting-BlackHole.ipynb')
-    _exec_notebook('../fitting/Static_Notebooks/Fitting-Halo.ipynb')
-    _exec_notebook('../fitting/Static_Notebooks/Fitting-Bulge.ipynb')
-    _exec_notebook('../fitting/Static_Notebooks/Fitting-Disk.ipynb')
+    _exec_notebook('Fitting-BlackHole.ipynb')
+    _exec_notebook('Fitting-Halo.ipynb')
+    _exec_notebook('Fitting-Bulge.ipynb')
+    _exec_notebook('Fitting-Disk.ipynb')
