@@ -30,3 +30,5 @@ before_script: cd NGC5533_Final
 
 script:
 - travis_wait 45 py.test
+- cd ../fitting/Static_Notebooks
+- travis_wait 45 py.test
