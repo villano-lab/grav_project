@@ -358,9 +358,9 @@ d = lambda h: 0.2*h                         #cut-off length upper limits (kpc)
 def d_px(r,u,xi):       #Initial Function
     x = lambda r,u,xi: (r**2+u**2+xi**2)/(2*r*u)
     try:
-        return x(r,u,xi)-(np.sqrt(x(r,u,xi)**2-1))
+        return x(r,u,xi)-np.sqrt(x(r,u,xi)**2-1)
     except ZeroDivisionError: #If dividing by zero, return infinity instead of error. (Mostly at 0)
-        return np.nan
+        return np.nan #This will allow nan handling later
 
 def d_rho0(r, h=h_c, d_rho00=drho00_c): #density piecewise function
     conditions = [r <= R(h),
