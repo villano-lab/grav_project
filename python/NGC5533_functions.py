@@ -415,12 +415,12 @@ def d_v(r,pref=0.5,h=h_c,d_rho00=drho00_c,save=False,load=True,comp='disk',**kwa
                 return b(r)
             except KeyError: #And if still unable to load, calculate and save.
                 save = True
-        except: #Attempting to catch problem with spline having too few points
-            print('An error has occured. Switching to save function. Error information below:')
-            print(sys.exc_info()[0])
-            print(sys.exc_info()[1])
-            print(sys.exc_info()[2])
-            save = True #Calculate since there aren't enough points
+            except: #Attempting to catch problem with spline having too few points
+                print('An error has occured. Switching to save function. Error information below:')
+                print(sys.exc_info()[0])
+                print(sys.exc_info()[1])
+                print(sys.exc_info()[2])
+                save = True #Calculate since there aren't enough points
     if save:
         r = np.asarray(r)
         a = np.sqrt(-r*d_Fv(r,h,d_rho00,pref))
@@ -432,6 +432,18 @@ def d_v(r,pref=0.5,h=h_c,d_rho00=drho00_c,save=False,load=True,comp='disk',**kwa
         a[np.isnan(a)] = 0
         return a
 
+def d_thief(r,pref=1):
+    sys.path.append('./')
+    import dataPython as dp
+    data = dp.getXYdata_wYerr('../fitting/data/nord-diskcurve.txt')
+    x = np.asarray(data['xx'])
+    y = np.asarray(data['yy'])
+    b = inter.InterpolatedUnivariateSpline(x,y,k=3) #k is the order of the polynomial    
+    return b(r)
+    
+   
+    
+    
 ################################
 ############ Total #############
 ################################
