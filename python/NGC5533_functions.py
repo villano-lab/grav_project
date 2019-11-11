@@ -394,7 +394,9 @@ def d_F(r,h=h_c,d_rho00=drho00_c,pref=1): #multiplying by upsylon. Generally we 
         return val
 d_Fv = np.vectorize(d_F)
 
-def d_v(r,h=h_c,d_rho00=drho00_c,pref=1,save=False,load=True,comp='disk',**kwargs): #velocity
+#NOTE: The order of variables for d_v is different than above, and is different from how they are listed in the load/save.
+#This should not adversely affect anything, just be careful that you have inputs in the correct order for the given function.
+def d_v(r,pref=0.5,h=h_c,d_rho00=drho00_c,save=False,load=True,comp='disk',**kwargs): #velocity
     if isinstance(r,float) or isinstance(r,int):
         r = np.asarray([r])
     if isinstance(r,list):
