@@ -2,6 +2,7 @@
 ########### Imports ############
 ################################
 import sys
+import traceback
 import numpy as np
 import scipy.special as ss
 import scipy.optimize as so
@@ -183,9 +184,17 @@ def bh_v(r,M=Mbh_def,save=False,load=True,comp='blackhole',**kwargs): #M in sola
             return spline(r)
         except: #Attempting to catch problem with spline having too few points
             print('An error has occured. Switching to save function. Error information below:')
-            print(sys.exc_info()[0])
-            print(sys.exc_info()[1])
-            print(sys.exc_info()[2])
+                print(sys.exc_info()[0])
+                print(sys.exc_info()[1])
+                print()
+                print('#--------------------')
+                print()
+                print()
+                print(traceback.format_exc())
+                print()
+                print()
+                print('#--------------------')
+                print()
             save = True #Calculate since there aren't enough points
     if save:
         savedata(r,a,comp,'Mbh'+str(M),file=comp+'.hdf5',**kwargs)
@@ -235,9 +244,17 @@ def b_v(r,n=n_c,re=re_c,save=False,load=True,comp='bulge',**kwargs):
             save = True  #go to save function instead
         except: #Attempting to catch problem with spline having too few points
             print('An error has occured. Switching to save function. Error information below:')
-            print(sys.exc_info()[0])
-            print(sys.exc_info()[1])
-            print(sys.exc_info()[2])
+                print(sys.exc_info()[0])
+                print(sys.exc_info()[1])
+                print()
+                print('#--------------------')
+                print()
+                print()
+                print(traceback.format_exc())
+                print()
+                print()
+                print('#--------------------')
+                print()
             save = True #Calculate since there aren't enough points
     a = b_vsquarev(r,n,re)**(1/2)
     a[np.isnan(a)] = 0
@@ -303,9 +320,17 @@ def h_viso(r,rc=h_rc,rho00=hrho00_c,load=True,save=False,comp='halo',**kwargs): 
             save = True #Calculate and save
         except: #Attempting to catch problem with spline having too few points
             print('An error has occured. Switching to save function. Error information below:')
-            print(sys.exc_info()[0])
-            print(sys.exc_info()[1])
-            print(sys.exc_info()[2])
+                print(sys.exc_info()[0])
+                print(sys.exc_info()[1])
+                print()
+                print('#--------------------')
+                print()
+                print()
+                print(traceback.format_exc())
+                print()
+                print()
+                print('#--------------------')
+                print()
             save = True #Calculate since there aren't enough points
     if save:
         savedata(r,a,comp,'rc'+str(rc)+'rho00'+str(rho00),file=comp+'.hdf5',**kwargs)
@@ -419,7 +444,15 @@ def d_v(r,pref=0.5,h=h_c,d_rho00=drho00_c,save=False,load=True,comp='disk',**kwa
                 print('An error has occured. Switching to save function. Error information below:')
                 print(sys.exc_info()[0])
                 print(sys.exc_info()[1])
-                print(sys.exc_info()[2])
+                print()
+                print('#--------------------')
+                print()
+                print()
+                print(traceback.format_exc())
+                print()
+                print()
+                print('#--------------------')
+                print()
                 save = True #Calculate since there aren't enough points
     if save:
         r = np.asarray(r)
@@ -460,9 +493,17 @@ def v(r,M=Mbh_def,re=re_c,h=h_c,d_rho00=drho00_c,pref=1,rc=h_rc,h_rho00=hrho00_c
             save = True  #Save instead
         except: #Attempting to catch problem with spline having too few points
             print('An error has occured. Switching to save function. Error information below:')
-            print(sys.exc_info()[0])
-            print(sys.exc_info()[1])
-            print(sys.exc_info()[2])
+                print(sys.exc_info()[0])
+                print(sys.exc_info()[1])
+                print()
+                print('#--------------------')
+                print()
+                print()
+                print(traceback.format_exc())
+                print()
+                print()
+                print('#--------------------')
+                print()
             save = True #Calculate since there aren't enough points
     a = np.sqrt(np.sqrt(h_v(r,rc,h_rho00,load,save)**2+d_v(r,h,d_rho00,pref,load,save)**2+bh_v(r,M,load,save)**2+b_v(r,re,load,save)**2))
     a[np.isnan(a)] = 0
