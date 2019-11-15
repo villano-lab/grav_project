@@ -15,5 +15,5 @@ def test():
     print('Testing Jupyter notebooks...')
     _exec_notebook('Fitting-BlackHole.ipynb')
     _exec_notebook('Fitting-Halo.ipynb')
-    _exec_notebook('Fitting-Bulge.ipynb')
+#    _exec_notebook('Fitting-Bulge.ipynb')
     _exec_notebook('Fitting-Disk.ipynb')
