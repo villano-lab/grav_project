@@ -356,6 +356,7 @@ d = lambda h: 0.2*h                         #cut-off length upper limits (kpc)
 #----- Functions ---------
 
 def d_px(r,u,xi):       #Initial Function
+    #Matches Casertano
     x = lambda r,u,xi: (r**2+u**2+xi**2)/(2*r*u)
     try:
         return x(r,u,xi)-np.sqrt(x(r,u,xi)**2-1)
@@ -363,15 +364,17 @@ def d_px(r,u,xi):       #Initial Function
         return np.nan #This will allow nan handling later
 
 def d_rho0(r, h=h_c, d_rho00=drho00_c): #density piecewise function
+    #Matches Casertano
     conditions = [r <= R(h),
                   (r > R(h)) & (r <= R(h)+d(h)), 
                   r > R(h)+d(h)]
     functions = [lambda r,h,d_rho00: d_rho00*np.exp(-r/h),
-                 lambda r,h,d_rho00: d_rho00*np.exp(-R(h)/h)*(1-((r-R(h))/d(h))),
+                 lambda r,h,d_rho00: d_rho00*np.exp(-R(h)/h)*(1-(r-R(h))/d(h)),
                  lambda r,h,d_rho00: 0]
     return np.piecewise(r, conditions, functions, h, d_rho00)
 
 def d_durho0(r, h=h_c, d_rho00=drho00_c): #partial derivative of rho(u,xi)
+    #Doesn't seem to be written explicitly, but should match Casertano (derivative should be accurate at least where the problem is at the cusp (where it is 0))
     conditions = [r <= R(h),
                   (r > R(h)) & (r <= (R(h)+d(h))),
                   r > (R(h)+d(h))]
@@ -382,25 +385,31 @@ def d_durho0(r, h=h_c, d_rho00=drho00_c): #partial derivative of rho(u,xi)
 
 #Disk Density Distribution
 def d_rho_rz(r,z,h=h_c,d_rho00=drho00_c):
+    #Matches Casertano
     return d_rho0(r, h, d_rho00)*np.power(np.cosh(z/z0(h)), -2)
 def d_drho_rz(r,z,h=h_c,d_rho00=drho00_c):
+    #Doesn't seem to be written explicitly, but should match Casertano (derivative with respect to u, cosh term has no "u")
     try:
         return d_durho0(r, h, d_rho00)*np.power(np.cosh(z/z0(h)), -2)
     except ZeroDivisionError:
         return nan
 
 def d_K(r,u,xi): #Complete Elliptic Integral
+    #Matches Casertano
     return 2*(ss.ellipk(d_px(r,u,xi)) - ss.ellipe(d_px(r,u,xi)))/(np.pi*np.sqrt(r*u*d_px(r,u,xi)))
 
 def d_innerfunc(z,r,u,h=h_c,d_rho00=drho00_c):  #Inner Function (3D)
+    #Matches Casertano, where K = 2*(stuff)
     return d_drho_rz(u, z, h, d_rho00)*d_K(r,u,z)
 
 def d_innerintegral(u,r,h=h_c,d_rho00=drho00_c): #Integrate Function
-    return u*si.quad(d_innerfunc, 0, 125, args=(r,u,h,d_rho00))[0]
+    #Matches Casertano, with the exception of the 125 limit due to computing limitations
+    return si.quad(d_innerfunc, 0, 125, args=(r,u,h,d_rho00))[0]
 #Args passed into quad need to be numbers, not arrays. (?)
 
 def d_outerintegral(r,h=h_c,d_rho00=drho00_c): #Integrate Outer Function
-    return si.quad(d_innerintegral, 0, np.inf, args=(r,h,d_rho00))[0]
+    #Matches casertano
+    return si.quad(u*d_innerintegral, 0, np.inf, args=(r,h,d_rho00))[0]
 
 def d_Mdblintrho(h=h_c,d_rho00=drho00_c):    #M double-integral rho
     rho_rz_r = lambda z,r,h,d_rho00: d_rho_rz(r,z,h,d_rho00)*r
@@ -410,6 +419,7 @@ def d_Mdblintrho(h=h_c,d_rho00=drho00_c):    #M double-integral rho
 pref_def = 2.352579926191481 #epsdisk*(L0/d_Mdblintrho(defaults))
 
 def d_F(r,h=h_c,d_rho00=drho00_c,pref=1): #multiplying by upsylon. Generally we should either use pref or h and d
+    #Matches Casertano
     if pref == False:
         pref = epsdisk*(L0/d_Mdblintrho(h,d_rho00))
     val = 4*np.pi*G*d_outerintegral(r,h,d_rho00)*pref
@@ -421,7 +431,9 @@ d_Fv = np.vectorize(d_F)
 
 #NOTE: The order of variables for d_v is different than above, and is different from how they are listed in the load/save.
 #This should not adversely affect anything, just be careful that you have inputs in the correct order for the given function.
+#This was done for conveneince; pref is now first and easy to call as the only non-default.
 def d_v(r,pref=0.5,h=h_c,d_rho00=drho00_c,save=False,load=True,comp='disk',**kwargs): #velocity
+    #Matches Casertano
     if isinstance(r,float) or isinstance(r,int):
         r = np.asarray([r])
     if isinstance(r,list):
