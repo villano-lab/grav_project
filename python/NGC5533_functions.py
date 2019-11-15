@@ -471,7 +471,7 @@ def d_thief(r,pref=1):
     data = dp.getXYdata_wYerr('../fitting/data/nord-diskcurve.txt')
     x = np.asarray(data['xx'])
     y = np.asarray(data['yy'])
-    b = inter.InterpolatedUnivariateSpline(x,y,k=3) #k is the order of the polynomial    
+    b = inter.InterpolatedUnivariateSpline(x,y,k=1) #k is the order of the polynomial    
     return b(r)
     
    
