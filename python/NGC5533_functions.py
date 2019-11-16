@@ -177,25 +177,27 @@ def bh_v(r,M=Mbh_def,save=False,load=True,comp='blackhole',**kwargs): #M in sola
             #print(file) #Troubleshooting
             y = loaddata(comp,'Mbh'+str(M),file=comp+'.hdf5',**kwargs)[1]
             x = loaddata(comp,'Mbh'+str(M),file=comp+'.hdf5',**kwargs)[0]
-        except KeyError: #If unable to load, load default instead and apply a prefactor retroactively
-            y = np.sqrt(M)*loaddata(comp,'Mbh1',file=comp+'.hdf5',**kwargs)[1]
-            x = loaddata(comp,'Mbh1',file=comp+'.hdf5',**kwargs)[0]
-            spline = inter.InterpolatedUnivariateSpline(x,y,k=3) #k is the order of the polynomial
-            return spline(r)
-        except: #Attempting to catch problem with spline having too few points
-            print('An error has occured. Switching to save function. Error information below:')
-            print(sys.exc_info()[0])
-            print(sys.exc_info()[1])
-            print()
-            print('#--------------------')
-            print()
-            print()
-            print(traceback.format_exc())
-            print()
-            print()
-            print('#--------------------')
-            print()
-            save = True #Calculate since there aren't enough points
+        except KeyError: #If unable to load, save
+	   #If unable to load, load default instead and apply a prefactor retroactively
+           # y = np.sqrt(M)*loaddata(comp,'Mbh1',file=comp+'.hdf5',**kwargs)[1]
+           # x = loaddata(comp,'Mbh1',file=comp+'.hdf5',**kwargs)[0]
+           # spline = inter.InterpolatedUnivariateSpline(x,y,k=3) #k is the order of the polynomial
+           # return spline(r)
+	    save = True
+       # except: #Attempting to catch problem with spline having too few points
+           # print('An error has occured. Switching to save function. Error information below:')
+           # print(sys.exc_info()[0])
+           # print(sys.exc_info()[1])
+           # print()
+           # print('#--------------------')
+           # print()
+           # print()
+           # print(traceback.format_exc())
+           # print()
+           # print()
+           # print('#--------------------')
+           # print()
+           # save = True #Calculate since there aren't enough points
     if save:
         savedata(r,a,comp,'Mbh'+str(M),file=comp+'.hdf5',**kwargs)
         return a
@@ -404,12 +406,13 @@ def d_innerfunc(z,r,u,h=h_c,d_rho00=drho00_c):  #Inner Function (3D)
 
 def d_innerintegral(u,r,h=h_c,d_rho00=drho00_c): #Integrate Function
     #Matches Casertano, with the exception of the 125 limit due to computing limitations
-    return si.quad(d_innerfunc, 0, 125, args=(r,u,h,d_rho00))[0]
+    #u was passed from outerintegral to prevent errors.
+    return si.quad(u*d_innerfunc, 0, 125, args=(r,u,h,d_rho00))[0]
 #Args passed into quad need to be numbers, not arrays. (?)
 
 def d_outerintegral(r,h=h_c,d_rho00=drho00_c): #Integrate Outer Function
-    #Matches casertano
-    return si.quad(u*d_innerintegral, 0, np.inf, args=(r,h,d_rho00))[0]
+    #Matches casertano. u was passed at the end of innerintegral to prevent errors.
+    return si.quad(d_innerintegral, 0, np.inf, args=(r,h,d_rho00))[0]
 
 def d_Mdblintrho(h=h_c,d_rho00=drho00_c):    #M double-integral rho
     rho_rz_r = lambda z,r,h,d_rho00: d_rho_rz(r,z,h,d_rho00)*r
