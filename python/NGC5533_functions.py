@@ -407,7 +407,7 @@ def d_innerfunc(z,r,u,h=h_c,d_rho00=drho00_c):  #Inner Function (3D)
 def d_innerintegral(u,r,h=h_c,d_rho00=drho00_c): #Integrate Function
     #Matches Casertano, with the exception of the 125 limit due to computing limitations
     #u was passed from outerintegral to prevent errors.
-    return si.quad(u*d_innerfunc, 0, 125, args=(r,u,h,d_rho00))[0]
+    return u*si.quad(d_innerfunc, 0, 125, args=(r,u,h,d_rho00))[0]
 #Args passed into quad need to be numbers, not arrays. (?)
 
 def d_outerintegral(r,h=h_c,d_rho00=drho00_c): #Integrate Outer Function
