@@ -485,6 +485,15 @@ def d_thief(r,pref=1):
     y = np.asarray(data['yy'])
     b = inter.InterpolatedUnivariateSpline(x,y,k=1) #k is the order of the polynomial    
     return b(r)
+
+def g_thief(r,pref=1):
+    sys.path.append('./')
+    import dataPython as dp
+    data = dp.getXYdata('../fitting/data/noord_gas_120kpc.txt')
+    x = np.asarray(data['xx'])
+    y = np.asarray(data['yy'])
+    b = inter.InterpolatedUnivariateSpline(x,y,k=1) #k is the order of the polynomial    
+    return b(r)
     
    
     
