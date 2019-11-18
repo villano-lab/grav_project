@@ -33,7 +33,7 @@ L0 = np.power(10, (0.4*(magsun-absmag))) #Absolute Magnitude to luminosity
 ups = 2.8                         #mass-to-light ratio (from Rotation Curves of Sersic Bulges paper)
 q = 0.33                          #intrinsic axis ratio
 e2 = 1-(q**2)                     #eccentricity
-i = 45*(np.pi/180)                #inclination angle
+i = 52*(np.pi/180)                #inclination angle
 h_rc = 1.4                        #core radius (kpc)
 c = 1e-12                         #(what does this constant do?)
 Mvir = 1e11*((c/(11.7))**(-40/3)) #virial mass (in solar mass) solved from eq(5)
@@ -183,7 +183,7 @@ def bh_v(r,M=Mbh_def,save=False,load=True,comp='blackhole',**kwargs): #M in sola
            # x = loaddata(comp,'Mbh1',file=comp+'.hdf5',**kwargs)[0]
            # spline = inter.InterpolatedUnivariateSpline(x,y,k=3) #k is the order of the polynomial
            # return spline(r)
-	   save = True
+	        save = True
        # except: #Attempting to catch problem with spline having too few points
            # print('An error has occured. Switching to save function. Error information below:')
            # print(sys.exc_info()[0])
