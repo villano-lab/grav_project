@@ -3,11 +3,13 @@ We used the same units as this paper, so no unit conversions will be necessary
 
 **Ups_b:**
 - M/L Ratio of the bulge.
-- Are we fitting for this? This is what the prefactor is going to represent?
+- This is called "ups" in the library
+- Not fitting for this value.
 
 **Ups_d**
 - M/L Ratio of the disk.
-- We are definitely fitting for this; read our documentation to figure out how the `pref` relates to this
+- notes/JB/Writeup_Notes.ipynb gives a direct relationship between this and the prefactor.
+    - linear relationship; just multiply both sides by the demoninator
 
 **R_c:**
 - We are fitting for this directly; no conversions necessary
