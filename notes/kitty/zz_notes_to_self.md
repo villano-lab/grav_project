@@ -1,2 +1,4 @@
 Anything sent in one of the "meeting notes" emails that needs to be done is either complete, assigned to someone else, or is in the planner now.
-- This is up-to-date as of 24 Nov 2019
+- This is up-to-date as of 29 Nov 2019
+
+Based on Casertano model of the halo, halo density should be dropping with r and z, but not going to zero except at infinite z or r
