@@ -7,7 +7,7 @@ We used the same units as this paper, so no unit conversions will be necessary
 
 **Ups_d**
 - M/L Ratio of the disk.
-- We are definitely fitting for this; ;read our documentation to figure out how the `pref` relates to this
+- We are definitely fitting for this; read our documentation to figure out how the `pref` relates to this
 
 **R_c:**
 - We are fitting for this directly; no conversions necessary
