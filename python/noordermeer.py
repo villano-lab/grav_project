@@ -14,19 +14,21 @@ import matplotlib.pyplot as plt
 ################################
 ######### Data files ###########
 ################################
-data_total = dp.getXYdata('../data/final/nord-120kpc-total.txt')
-data_bh = dp.getXYdata('../data/final/nord-120kpc-blackhole.txt')
-data_bulge = dp.getXYdata('../data/final/nord-120kpc-bulge.txt')
-data_disk = dp.getXYdata('../data/final/nord-120kpc-disk.txt')
-data_halo = dp.getXYdata('../data/final/nord-120kpc-halo.txt')
-data_gas = dp.getXYdata('../data/final/nord-120kpc-gas.txt')
-data_greyb_bottom = dp.getXYdata('../data/final/nord-120kpc-bottomband.txt')
-data_greyb_top = dp.getXYdata('../data/final/nord-120kpc-topband.txt')
+data_total = dp.getXYdata('../fitting/data/final/nord-120kpc-total.txt')
+data_bh = dp.getXYdata('../fitting/data/final/nord-120kpc-blackhole.txt')
+data_bulge = dp.getXYdata('../fitting/data/final/nord-120kpc-bulge.txt')
+data_disk = dp.getXYdata('../fitting/data/final/nord-120kpc-disk.txt')
+data_halo = dp.getXYdata('../fitting/data/final/nord-120kpc-halo.txt')
+data_gas = dp.getXYdata('../fitting/data/final/nord-120kpc-gas.txt')
+data_greyb_bottom = dp.getXYdata('../fitting/data/final/nord-120kpc-bottomband.txt')
+data_greyb_top = dp.getXYdata('../fitting/data/final/nord-120kpc-topband.txt')
+
+rval = np.linspace(0.1,120,200)
 
 ################################
 ##### Measured data points #####
 ################################
-data = dp.getXYdata_wXYerr('../data/100kpc_data.txt')
+data = dp.getXYdata_wXYerr('../fitting/data/100kpc_data.txt')
 r_dat = np.asarray(data['xx'])
 v_dat = np.asarray(data['yy'])
 v_err0 = np.asarray(data['ex'])
