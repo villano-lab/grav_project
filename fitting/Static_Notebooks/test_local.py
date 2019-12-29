@@ -18,3 +18,4 @@ def test():
     _exec_notebook('Fitting-Bulge.ipynb')
     _exec_notebook('Fitting-Disk.ipynb')
     _exec_notebook('FittingB-D.ipynb')
+    _exec_notebook('NGC5533_Nordermeer_plot.ipynb')
