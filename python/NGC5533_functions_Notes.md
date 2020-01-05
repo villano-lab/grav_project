@@ -4,7 +4,7 @@ This is not thorough documentation on the functions, but I figured a few notes m
 The following dependencies are required:
 - numpy
 - scipy
-The following dependency is optional, but some features will not work without it:
+The following dependency is optional, but highly recommended (several features will not work without it):
 - h5py
 
 ### Function Naming Convention
@@ -39,6 +39,6 @@ Functions which save or load data have defaults set to use the expected structur
 This is as follows:
 - The file used for storing calculations is in the current directory. You can change this with the `path` variable.
 - The name of this file is based on the component ('total.hdf5','disk.hdf5','bulge.hdf5','blackhole.hdf5').
-- Currently, each file has only one group with the same name (without the hdf5) due to file size limitations
-- Within that file and group, each unique set of parameters will be a single dataset
-- Each dataset will contain two numpy arrays, the zeroth corresponding to x-data and the first corresponding to calculated y-values
+- Currently, each file has only one group with the same name (without the hdf5). This structure is due to file size limitations.
+- Within that file and group, each unique set of parameters will be a single dataset.
+- Each dataset will contain two numpy arrays, the zeroth corresponding to x-data and the first corresponding to calculated y-values.
