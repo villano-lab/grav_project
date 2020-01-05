@@ -26,7 +26,7 @@ install:
   - conda env create -n test-environment python=$TRAVIS_PYTHON_VERSION -f grav_env.yml
   - source activate test-environment
 
-before_script: cd NGC5533_Final
+before_script: cd NGC5533_Static_Final
 
 script:
 - travis_wait 45 py.test
