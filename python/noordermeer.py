@@ -42,8 +42,11 @@ v_bottomband = np.asarray(data_greyb_bottom['yy'])
 r_topband = np.asarray(data_greyb_top['xx'])
 v_topband = np.asarray(data_greyb_top['yy'])
 
-noord_greyb_bottom = inter.spline(r_bottomband,v_bottomband,rval,kind='smoothest')
-noord_greyb_top = inter.spline(r_topband,v_topband,rval,kind='smoothest')
+tgb, cgb, kgb = inter.splrep(r_bottomband,v_topband)
+tgt, cgt, kgt = inter.splrep(r_topband, v_topband)
+
+noord_greyb_bottom = inter.BSpline(tgb,cgb,kgb)
+noord_greyb_top = inter.BSpline(tgt,cgt,kgt)
 
 ################################
 ######### Total curve ##########
@@ -51,7 +54,8 @@ noord_greyb_top = inter.spline(r_topband,v_topband,rval,kind='smoothest')
 r_total = np.asarray(data_total['xx'])
 v_total = np.asarray(data_total['yy'])
 
-noord_total = inter.spline(r_total,v_total,rval,kind='smoothest')
+tt, ct, kt = inter.splrep(r_total,v_total)
+noord_total = inter.BSpline(tt,ct,kt)
 
 ################################
 ######### Black Hole ###########
@@ -59,7 +63,8 @@ noord_total = inter.spline(r_total,v_total,rval,kind='smoothest')
 r_bh = np.asarray(data_bh['xx'])
 v_bh = np.asarray(data_bh['yy'])
 
-noord_blackhole = inter.spline(r_bh,v_bh,rval,kind='smoothest')
+tbh, cbh, kbh = inter.splrep(r_bh,v_bh)
+noord_blackhole = inter.BSpline(tbh,cbh,kbh)
 
 ################################
 ############ Bulge #############
@@ -67,7 +72,8 @@ noord_blackhole = inter.spline(r_bh,v_bh,rval,kind='smoothest')
 r_bulge = np.asarray(data_bulge['xx'])
 v_bulge = np.asarray(data_bulge['yy'])
 
-noord_bulge = inter.spline(r_bulge,v_bulge,rval,kind='smoothest')
+tb, cb, kb = inter.splrep(r_bulge,v_bulge)
+noord_bulge = inter.BSpline(rb,cb,kb)
 
 ################################
 ############ Disk ##############
@@ -75,7 +81,8 @@ noord_bulge = inter.spline(r_bulge,v_bulge,rval,kind='smoothest')
 r_disk = np.asarray(data_disk['xx'])
 v_disk = np.asarray(data_disk['yy'])
 
-noord_disk = inter.spline(r_disk,v_disk,rval,kind='smoothest')
+td, cd, kd = inter.splrep(r_disk,v_disk)
+noord_disk = inter.BSpline(td,cd,kd)
 
 ################################
 ############ Halo ##############
@@ -83,7 +90,8 @@ noord_disk = inter.spline(r_disk,v_disk,rval,kind='smoothest')
 r_halo = np.asarray(data_halo['xx'])
 v_halo = np.asarray(data_halo['yy'])
 
-noord_halo = inter.spline(r_halo,v_halo,rval,kind='smoothest')
+th, ch, kh = inter.splrep(r_halo,v_halo)
+noord_halo = inter.BSpline(th,ch,kh)
 
 ################################
 ############# Gas ##############
@@ -91,4 +99,5 @@ noord_halo = inter.spline(r_halo,v_halo,rval,kind='smoothest')
 r_gas = np.asarray(data_gas['xx'])
 v_gas = np.asarray(data_gas['yy'])
 
-noord_gas = inter.spline(r_gas,v_gas,rval,kind='smoothest')
+tg,cg,kg = inter.splrep(r_gas,v_gas)
+noord_gas = inter.BSpline(tg,cg,kg)
