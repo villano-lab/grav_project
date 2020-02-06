@@ -24,13 +24,13 @@ G = 4.30091e-6    #gravitational constant (kpc/solar mass*(km/s)^2)
 rhocrit = 9.3e-18 #critical density of the Universe (kg/km^3)
 
 #---------Measured Directly-----------
-L = 3.27e10                              #luminosity
+L = 3.27e10                              #luminosity (Solar Luminosities)
 absmag = -22.02                          #absolute magnitude
 magsun = 4.42                            #absolute magnitude of the sun
 L0 = np.power(10, (0.4*(magsun-absmag))) #Absolute Magnitude to luminosity
 
 #---------Measured Indirectly---------
-ups = 2.8                         #mass-to-light ratio (from Rotation Curves of Sersic Bulges paper)
+ups = 2.8                         #bulge mass-to-light ratio (Solar Mass/Solar Luminosity)???
 q = 0.33                          #intrinsic axis ratio
 e2 = 1-(q**2)                     #eccentricity
 i = 52*(np.pi/180)                #inclination angle
@@ -42,8 +42,8 @@ Mbh_def = 2.7e9                   #Black Hole mass (in solar mass)
 #---------Definitely Variable---------
 n_c = 2.7                         #concentration parameter
 h_c = 8.9                         #radial scale-length (kpc)
-hrho00_c = 0.31e9                 #halo central surface density (solar mass/kpc^3)
-drho00_c = 0.31e9                 #disk central surface density (solar mass/kpc^3)
+hrho00_c = 0.31e9                 #halo central surface density (solar mass/kpc^2)
+drho00_c = 0.31e9                 #disk central surface density (solar mass/kpc^2)
 
 #---------Uncategorized-------------------
 re_c = 2.6                                               #effective radius (kpc)
