@@ -23,7 +23,8 @@ data_gas = dp.getXYdata('../fitting/data/final/nord-120kpc-gas.txt')
 data_greyb_bottom = dp.getXYdata('../fitting/data/final/nord-120kpc-bottomband.txt')
 data_greyb_top = dp.getXYdata('../fitting/data/final/nord-120kpc-topband.txt')
 
-rval = np.linspace(0.1,120,200)
+rval = np.linspace(0.1,120,500)
+rb = np.linspace(0.1,120,500)
 
 ################################
 ##### Measured data points #####
