@@ -57,7 +57,7 @@ h_gamma = 0
 ################################
 
 def savedata(xvalues,yvalues,group,dataset,path='./',file='Inputs.hdf5'): 
-#this is a dummy filename; try not to save here except for testing!
+#this is a dummy filename to enforce ordering; try not to save here except for testing!
     if h5py == 1:
         saved = h5.File(path+'/'+file,'a')
         if group in ['Disk', 'disc', 'Disc',  'd', 'D']:
@@ -377,6 +377,7 @@ def d_rho0(r, h=h_c, d_rho00=drho00_c): #density piecewise function
 
 def d_durho0(r, h=h_c, d_rho00=drho00_c): #partial derivative of rho(u,xi)
     #Doesn't seem to be written explicitly, but should match Casertano (derivative should be accurate at least where the problem is at the cusp (where it is 0))
+    #Casertano takes the derivative of rho(u,z) with respect to u; here we take the derivative of rho(r,z) with repsect to r, which is equivalent.
     conditions = [r <= R(h),
                   (r > R(h)) & (r <= (R(h)+d(h))),
                   r > (R(h)+d(h))]
@@ -407,7 +408,7 @@ def d_innerfunc(z,r,u,h=h_c,d_rho00=drho00_c):  #Inner Function (3D)
 def d_innerintegral(u,r,h=h_c,d_rho00=drho00_c): #Integrate Function
     #Matches Casertano, with the exception of the 125 limit due to computing limitations
     #u was passed from outerintegral to prevent errors.
-    return u*si.quad(d_innerfunc, 0, 125, args=(r,u,h,d_rho00))[0]
+    return u*si.quad(d_innerfunc, 0, R(h)+d(h), args=(r,u,h,d_rho00))[0]
 #Args passed into quad need to be numbers, not arrays. (?)
 
 def d_outerintegral(r,h=h_c,d_rho00=drho00_c): #Integrate Outer Function
@@ -416,8 +417,8 @@ def d_outerintegral(r,h=h_c,d_rho00=drho00_c): #Integrate Outer Function
 
 def d_Mdblintrho(h=h_c,d_rho00=drho00_c):    #M double-integral rho
     rho_rz_r = lambda z,r,h,d_rho00: d_rho_rz(r,z,h,d_rho00)*r
-    Mintrho = lambda r,h,d_rho00: si.quad(rho_rz_r, -125, 125, args=(r,h,d_rho00))[0]
-    return si.quad(Mintrho,0,125,args=(h,d_rho00))[0]
+    Mintrho = lambda r,h,d_rho00: si.quad(rho_rz_r, -(R(h)+d(h)), R(h)+d(h), args=(r,h,d_rho00))[0]
+    return si.quad(Mintrho,0,np.inf,args=(h,d_rho00))[0]
 
 pref_def = 2.352579926191481 #epsdisk*(L0/d_Mdblintrho(defaults))
 
