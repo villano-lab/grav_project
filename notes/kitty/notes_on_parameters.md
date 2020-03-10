@@ -17,7 +17,5 @@ We used the same units as this paper, so no unit conversions will be necessary
 - 'rc'
 
 **rho_0**
-- Is this supposed to be rho_00?
-- can't find any explicit mention of rho_0 or rho_00 in the Nordermeer paper
-- We are fitting for this directly, assuming it is rho_00; no conversions necessary
-- Check again later to see if I can find anything on this.
+- This is from casertano
+- rho_0 is a function, rho_00 is a constant.
