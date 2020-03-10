@@ -23,5 +23,5 @@ def test():
     #It does, however, still need to finish a complete run so that runtime is up-to-date.
     #
     #_exec_notebook('FittingBH-B.ipynb) #Still waiting to run this; bulge file needs to be available.
-    _exec_notebook('FittingBH-D.ipynb)
+    _exec_notebook('FittingBH-D.ipynb')
     _exec_notebook('NGC5533_Noordermeer_plot.ipynb')
