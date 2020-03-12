@@ -15,3 +15,15 @@ Now Here are some example commands that we have used successfully:
 ./nhermes -lMyLog "rotmod TYPE=DISK ZLAW=SIMPLE-SECH Z0=1.78 USER=N DENS0=310 H=8.9 RCUT=35.6 DELTA=1.78 MASS=160 RADII=1:120:0.1"
 
 This will give the output to the "MyLog.LOG" file in the same directory.
+
+We also tried today an example where we supply the density and radius as a user-defined parameters:
+
+./nhermes -lMyLog "rotmod TYPE=DISK ZLAW=SIMPLE-SECH Z0=1.78 USER=Y PAIRS=N RADIUS=1 2 3 4 5 DENSITY=1 1 1 1 1 H=8.9 RCUT=35.6 DELTA=1.78 RADII=1:120:0.1 FILE=test1.txt"
+
+Note, the parameter MASS (if given) will force the normalization of the density to be consistent. It will still use the user-defined function, but off by a normalization constant. 
+
+You can also specify the Radius and Density together, in pairs:
+
+./nhermes -lMyLog "rotmod TYPE=DISK ZLAW=SIMPLE-SECH Z0=1.78 USER=Y PAIRS=Y RADDENS=1 1; 2 1; 3 1; 4 1; H=8.9 RCUT=35.6 DELTA=1.78 RADII=1:120:0.1 FILE=test2.txt"
+
+
