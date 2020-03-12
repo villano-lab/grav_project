@@ -1,0 +1,17 @@
+Notes 3/12/20
+============
+
+We have never really compiled the full GIPSY. We have managed to follow the instructions here:
+
+https://www.astro.rug.nl/~gipsy/installation/installation64.html
+
+To compile `nHermes` which allows us to run GIPSY commands, as long as they don't really require
+graphics. The documentation for `nHermes` is sparse, seen here:
+
+https://www.astro.rug.nl/~gipsy/hermes/nhermes.html
+
+Now Here are some example commands that we have used successfully:
+
+./nhermes -lMyLog "rotmod TYPE=DISK ZLAW=SIMPLE-SECH Z0=1.78 USER=N DENS0=310 H=8.9 RCUT=35.6 DELTA=1.78 MASS=160 RADII=1:120:0.1"
+
+This will give the output to the "MyLog.LOG" file in the same directory.
