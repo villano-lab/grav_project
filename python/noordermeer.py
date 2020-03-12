@@ -74,7 +74,7 @@ r_bulge = np.asarray(data_bulge['xx'])
 v_bulge = np.asarray(data_bulge['yy'])
 
 tb, cb, kb = inter.splrep(r_bulge,v_bulge)
-noord_bulge = inter.BSpline(rb,cb,kb)
+noord_bulge = inter.BSpline(tb,cb,kb)
 
 ################################
 ############ Disk ##############
