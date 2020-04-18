@@ -1,19 +1,27 @@
 ################################
 ########### Imports ############
 ################################
+#For error handling
 import sys
 import traceback
+#For calculations
 import numpy as np
 import scipy.special as ss
 import scipy.optimize as so
 import scipy.integrate as si
 import scipy.interpolate as inter
+#For saving & loading calculations
 try:
     import h5py as h5
     h5py = 1
 except ModuleNotFoundError:
     h5py = 0
     print("Could not find h5py. Datasets will not be able to be saved or loaded using NGC5533_functions.")
+#For path detection
+import subprocess
+def getGitRoot():
+    return subprocess.Popen(['git', 'rev-parse', '--show-toplevel'], stdout=subprocess.PIPE).communicate()[0].rstrip().decode('utf-8')
+defaultpath = getGitRoot()+'/fitting'
 
 ################################
 ########## Constants ###########
@@ -56,7 +64,7 @@ h_gamma = 0
 ########### Saving #############
 ################################
 
-def savedata(xvalues,yvalues,group,dataset,path='./',file='Inputs.hdf5'): 
+def savedata(xvalues,yvalues,group,dataset,path=defaultpath,file='Inputs.hdf5'): 
 #this is a dummy filename to enforce ordering; try not to save here except for testing!
     if h5py == 1:
         saved = h5.File(path+'/'+file,'a')
@@ -105,7 +113,7 @@ def savedata(xvalues,yvalues,group,dataset,path='./',file='Inputs.hdf5'):
         print("ERROR: h5py was not loaded.")
         return 1
     
-def loaddata(group,dataset,path='./',file='Inputs.hdf5'):
+def loaddata(group,dataset,path=defaultpath,file='Inputs.hdf5'):
     if h5py == 1:
         saved = h5.File(path+'/'+file)
         if group in ['Disk', 'disc', 'Disc', 'd', 'D']:
@@ -133,7 +141,7 @@ def loaddata(group,dataset,path='./',file='Inputs.hdf5'):
         return 1
     saved.close() #no matter what, close the file when you're done
     
-def checkfile(group='all',path='./',file='Inputs.hdf5'):
+def checkfile(group='all',path=defaultpath,file='Inputs.hdf5'):
     if h5py ==1:
         saved = h5.File(path+'/'+file,'r')
         if group == 'all':
