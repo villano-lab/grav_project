@@ -26,6 +26,6 @@ def test():
     #_exec_notebook('FittingBH-H_different_galaxies.ipynb') #Getting encoding error, not sure why.
     _exec_notebook('FittingBH-H.ipynb')
     #_exec_notebook('FittingD-H.ipynb') #Did not finish running within 3 days and halo file has reached maximum size. Can be re-attempted if disk is sped up.
-    #_exec_notebook('NGC5533_Noordermeer_plot-tweaked.ipynb') #Still waiting to run this; halo file needs to be available.
+    _exec_notebook('NGC5533_Noordermeer_plot-tweaked.ipynb')
     _exec_notebook('NGC5533_Noordermeer_plot.ipynb')
     _exec_notebook('time setup.ipynb') #Not something that should break, but will flag if time library updates break anything.
