@@ -1,23 +1,23 @@
 ################################
 ########### Imports ############
 ################################
-#For error handling
+#-----------For error handling-----------
 import sys
 import traceback
-#For calculations
+#------------For calculations------------
 import numpy as np
 import scipy.special as ss
 import scipy.optimize as so
 import scipy.integrate as si
 import scipy.interpolate as inter
-#For saving & loading calculations
+#----For saving & loading calculations---
 try:
     import h5py as h5
     h5py = 1
 except ModuleNotFoundError:
     h5py = 0
     print("Could not find h5py. Datasets will not be able to be saved or loaded using NGC5533_functions.")
-#For path detection
+#-----------For path detection-----------
 import subprocess
 def getGitRoot():
     return subprocess.Popen(['git', 'rev-parse', '--show-toplevel'], stdout=subprocess.PIPE).communicate()[0].rstrip().decode('utf-8')
@@ -115,7 +115,7 @@ def savedata(xvalues,yvalues,group,dataset,path=defaultpath,file='Inputs.hdf5'):
     
 def loaddata(group,dataset,path=defaultpath,file='Inputs.hdf5'):
     if h5py == 1:
-        saved = h5.File(path+'/'+file)
+        saved = h5.File(path+'/'+file,'r')
         if group in ['Disk', 'disc', 'Disc', 'd', 'D']:
             group = 'disk'
             print("Group name set to 'disk'.")
@@ -186,12 +186,12 @@ def bh_v(r,M=Mbh_def,save=False,load=True,comp='blackhole',**kwargs): #M in sola
             y = loaddata(comp,'Mbh'+str(M),file=comp+'.hdf5',**kwargs)[1]
             x = loaddata(comp,'Mbh'+str(M),file=comp+'.hdf5',**kwargs)[0]
         except KeyError: #If unable to load, save
-	   #If unable to load, load default instead and apply a prefactor retroactively
+       #If unable to load, load default instead and apply a prefactor retroactively
            # y = np.sqrt(M)*loaddata(comp,'Mbh1',file=comp+'.hdf5',**kwargs)[1]
            # x = loaddata(comp,'Mbh1',file=comp+'.hdf5',**kwargs)[0]
            # spline = inter.InterpolatedUnivariateSpline(x,y,k=3) #k is the order of the polynomial
            # return spline(r)
-	        save = True
+            save = True
        # except: #Attempting to catch problem with spline having too few points
            # print('An error has occured. Switching to save function. Error information below:')
            # print(sys.exc_info()[0])
