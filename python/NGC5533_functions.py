@@ -19,9 +19,10 @@ except ModuleNotFoundError:
     print("Could not find h5py. Datasets will not be able to be saved or loaded using NGC5533_functions.")
 #-----------For path detection-----------
 import subprocess
-def getGitRoot():
-    return subprocess.Popen(['git', 'rev-parse', '--show-toplevel'], stdout=subprocess.PIPE).communicate()[0].rstrip().decode('utf-8')
-defaultpath = getGitRoot()+'/fitting'
+#def getGitRoot():
+#    return subprocess.Popen(['git', 'rev-parse', '--show-toplevel'], stdout=subprocess.PIPE).communicate()[0].rstrip().decode('utf-8')
+#The above only functions correctly on Linux machines and has therefore been removed.
+defaultpath = './'
 
 ################################
 ########## Constants ###########
