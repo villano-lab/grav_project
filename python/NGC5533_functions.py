@@ -33,10 +33,10 @@ G = 4.30091e-6    #gravitational constant (kpc/solar mass*(km/s)^2)
 rhocrit = 9.3e-18 #critical density of the Universe (kg/km^3)
 
 #---------Measured Directly-----------
-L = 3.27e10                              #luminosity (Solar Luminosities)
+L = 3.27e10                              #luminosity (Solar Luminosities) for BULGE
 absmag = -22.02                          #absolute magnitude
 magsun = 4.42                            #absolute magnitude of the sun
-L0 = np.power(10, (0.4*(magsun-absmag))) #Absolute Magnitude to luminosity
+L0 = np.power(10, (0.4*(magsun-absmag))) #Absolute Magnitude to luminosity for DISK
 
 #---------Measured Indirectly---------
 ups = 2.8                         #bulge mass-to-light ratio (Solar Mass/Solar Luminosity)???
