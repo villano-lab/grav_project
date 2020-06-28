@@ -12,9 +12,9 @@
 ##########################################################
 ############ WARNING!!!!!!!!!!!!!!!!!!!!!!!!! ############
 ##########################################################
-print("WARNING: DO NOT USE THE disk.hdf5 FILE WITH CALCULATIONS FROM THIS LIBRRY!!!!")
+print("WARNING: DO NOT USE THE disk.hdf5 OR bulge.hdf5 FILES WITH CALCULATIONS FROM THIS LIBRRY!!!!")
 print("If you do, DISCARD ALL CHANGES TO THE FILE.")
-print("Your calculations will NOT be consistent with this library's equations if you use the disk.hdf5 file,")
+print("Your calculations will NOT be consistent with this library's equations if you use the disk.hdf5 or bulge.hdf5 files,")
 print("and if you write to that file it will contain calculations based on conflicting constants.")
 print("Worst case scenario, reset the disk.hdf5 file to before the commit where you used this library to write to it.")
 
@@ -53,12 +53,13 @@ G = 4.30091e-6    #gravitational constant (kpc/solar mass*(km/s)^2)
 rhocrit = 9.3e-18 #critical density of the Universe (kg/km^3)
 
 #---------Measured Directly-----------
-absmag = -22.02                          #absolute magnitude for DISK
+absmagd = -22.02                         #absolute magnitude for DISK
+absmagb = -21.66                         #absolute magnitude for BULGE
 #magsun = 4.42                            #absolute magnitude of the sun IN R-BAND
-magsun = 4.83                            #absolute magnitude of the sun BOLOMETRIC
+magsun = 4.75                            #absolute magnitude of the sun BOLOMETRIC
 #Bolometric is necessary to get the correct units of L_Sun. If we use the R-Band solar magnitude, our units will change!
-L0 = np.power(10, (0.4*(magsun-absmag))) #Absolute Magnitude to luminosity for DISK
-L = np.power(10, (0.4*(magsun+21.66)))   #luminosity (Solar Luminosities) of BULGE
+L0 = np.power(10, (0.4*(magsun-absmagd)))#Absolute Magnitude to luminosity for DISK
+L = np.power(10, (0.4*(magsun-absmagb)))   #luminosity (Solar Luminosities) of BULGE
 
 #---------Measured Indirectly---------
 ups = 2.8                         #bulge mass-to-light ratio (Solar Mass/Solar Luminosity)???
