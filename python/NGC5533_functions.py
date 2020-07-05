@@ -172,7 +172,7 @@ def checkfile(group='all',path=defaultpath,file='Inputs.hdf5'):
 ######### Black Hole ###########
 ################################
 
-def bh_v(r,M=Mbh_def,save=False,load=True,comp='blackhole',**kwargs): #M in solar masses, r in kpc
+def bh_v(r,M=Mbh_def,save=False,load=True,comp='blackhole',filename=comp+'.hdf5',**kwargs): #M in solar masses, r in kpc
     if isinstance(r,float) or isinstance(r,int):
         r = np.asarray([r])
     if isinstance(r,list):
@@ -184,31 +184,12 @@ def bh_v(r,M=Mbh_def,save=False,load=True,comp='blackhole',**kwargs): #M in sola
         try: #Load existing prefactor if available
             #file = comp+'.hdf5'
             #print(file) #Troubleshooting
-            y = loaddata(comp,'Mbh'+str(M),file=comp+'.hdf5',**kwargs)[1]
-            x = loaddata(comp,'Mbh'+str(M),file=comp+'.hdf5',**kwargs)[0]
+            y = loaddata(comp,'Mbh'+str(M),file=filename,**kwargs)[1]
+            x = loaddata(comp,'Mbh'+str(M),file=filename,**kwargs)[0]
         except KeyError: #If unable to load, save
-       #If unable to load, load default instead and apply a prefactor retroactively
-           # y = np.sqrt(M)*loaddata(comp,'Mbh1',file=comp+'.hdf5',**kwargs)[1]
-           # x = loaddata(comp,'Mbh1',file=comp+'.hdf5',**kwargs)[0]
-           # spline = inter.InterpolatedUnivariateSpline(x,y,k=3) #k is the order of the polynomial
-           # return spline(r)
             save = True
-       # except: #Attempting to catch problem with spline having too few points
-           # print('An error has occured. Switching to save function. Error information below:')
-           # print(sys.exc_info()[0])
-           # print(sys.exc_info()[1])
-           # print()
-           # print('#--------------------')
-           # print()
-           # print()
-           # print(traceback.format_exc())
-           # print()
-           # print()
-           # print('#--------------------')
-           # print()
-           # save = True #Calculate since there aren't enough points
     if save:
-        savedata(r,a,comp,'Mbh'+str(M),file=comp+'.hdf5',**kwargs)
+        savedata(r,a,comp,'Mbh'+str(M),file=filename,**kwargs)
         return a
     else:
         return a
@@ -242,13 +223,13 @@ def b_vsquarev(r,n=n_c,re=re_c):
     a = np.vectorize(b_vsquare)
     return a(r,n,re)
 
-def b_v(r,n=n_c,re=re_c,save=False,load=True,comp='bulge',**kwargs):
+def b_v(r,n=n_c,re=re_c,save=False,load=True,comp='bulge',filename=comp+'.hdf5'**kwargs):
     if isinstance(r,float) or isinstance(r,int):
         r = np.asarray([r])
     if load:
         try: #load if exists
-            y = loaddata(comp,'n'+str(n)+'re'+str(re),file=comp+'.hdf5',**kwargs)[1]
-            x = loaddata(comp,'n'+str(n)+'re'+str(re),file=comp+'.hdf5',**kwargs)[0]
+            y = loaddata(comp,'n'+str(n)+'re'+str(re),file=filename,**kwargs)[1]
+            x = loaddata(comp,'n'+str(n)+'re'+str(re),file=filename,**kwargs)[0]
             b = inter.InterpolatedUnivariateSpline(x,y,k=3) #k is the order of the polynomial
             return b(r)
         except KeyError: #if does not exist,
@@ -270,7 +251,7 @@ def b_v(r,n=n_c,re=re_c,save=False,load=True,comp='bulge',**kwargs):
     a = b_vsquarev(r,n,re)**(1/2)
     a[np.isnan(a)] = 0
     if save:
-        savedata(r,a,comp,'n'+str(n)+'re'+str(re),file=comp+'.hdf5',**kwargs)
+        savedata(r,a,comp,'n'+str(n)+'re'+str(re),file=filename,**kwargs)
         return a
     else:
         return a
@@ -292,7 +273,7 @@ def h_vcasertano(r,z,rc=h_rc,rho00=hrho00_c,gamma=h_gamma):                     
 def h_vjimenez(r,rc=h_rc,rho00=hrho00_c):
     return np.sqrt(4*np.pi*G*rho00*(rc**2)*(1-((rc/r)*np.arctan(r/rc))))
 
-def h_vNFW(r,save=True,comp='hNFW',**kwargs):
+def h_vNFW(r,save=True,comp='hNFW',,filename=comp+'.hdf5'**kwargs):
     rho = lambda r: rho_s/((r/rs)*((1+r/rs)**2))
     f = lambda R: 4*np.pi*rho(R)*(R**2)          #NFW Density Profile
     mdm = lambda r: si.quad(f, 0, r)[0]          #M(r)
@@ -301,14 +282,14 @@ def h_vNFW(r,save=True,comp='hNFW',**kwargs):
     a = np.sqrt(vdm2v(r))
     a[np.isnan(a)] = 0
     if save:
-        savedata(r,a,comp,'n'+str('PLACEHOLDER'),file=comp+'.hdf5',**kwargs)
+        savedata(r,a,comp,'n'+str('PLACEHOLDER'),file=filename,**kwargs)
         return a
     elif load:
-        return loaddata(comp,'n'+str('PLACEHOLDER'),file=comp+'.hdf5',**kwargs)
+        return loaddata(comp,'n'+str('PLACEHOLDER'),file=filename,**kwargs)
     else:
         return a(r)
 
-def h_viso(r,rc=h_rc,rho00=hrho00_c,load=True,save=False,comp='halo',**kwargs):   #h_v iso
+def h_viso(r,rc=h_rc,rho00=hrho00_c,load=True,save=False,comp='halo',filename=comp+'.hdf5',**kwargs):   #h_v iso
     if isinstance(r,float) or isinstance(r,int):
         r = np.asarray([r])
     a = np.zeros(len(r))
@@ -323,8 +304,8 @@ def h_viso(r,rc=h_rc,rho00=hrho00_c,load=True,save=False,comp='halo',**kwargs): 
     a[np.isnan(a)] = 0
     if load:
         try: #Load if exists
-            y = loaddata(comp,'rc'+str(rc)+'rho00'+str(rho00),file=comp+'.hdf5',**kwargs)[1]
-            x = loaddata(comp,'rc'+str(rc)+'rho00'+str(rho00),file=comp+'.hdf5',**kwargs)[0]
+            y = loaddata(comp,'rc'+str(rc)+'rho00'+str(rho00),file=filename,**kwargs)[1]
+            x = loaddata(comp,'rc'+str(rc)+'rho00'+str(rho00),file=filename,**kwargs)[0]
             b = inter.InterpolatedUnivariateSpline(x,y,k=3) #k is the order of the polynomial
             return b(r)
         except KeyError: #If does not exist,
@@ -344,7 +325,7 @@ def h_viso(r,rc=h_rc,rho00=hrho00_c,load=True,save=False,comp='halo',**kwargs): 
             print()
             save = True #Calculate since there aren't enough points
     if save:
-        savedata(r,a,comp,'rc'+str(rc)+'rho00'+str(rho00),file=comp+'.hdf5',**kwargs)
+        savedata(r,a,comp,'rc'+str(rc)+'rho00'+str(rho00),file=filename,**kwargs)
         return a
     else:
         return a
@@ -445,7 +426,7 @@ d_Fv = np.vectorize(d_F)
 #NOTE: The order of variables for d_v is different than above, and is different from how they are listed in the load/save.
 #This should not adversely affect anything, just be careful that you have inputs in the correct order for the given function.
 #This was done for conveneince; pref is now first and easy to call as the only non-default.
-def d_v(r,pref=0.5,h=h_c,d_rho00=drho00_c,save=False,load=True,comp='disk',**kwargs): #velocity
+def d_v(r,pref=0.5,h=h_c,d_rho00=drho00_c,save=False,load=True,comp='disk',filename=comp+'.hdf5',**kwargs): #velocity
     #Matches Casertano
     if isinstance(r,float) or isinstance(r,int):
         r = np.asarray([r])
@@ -453,14 +434,14 @@ def d_v(r,pref=0.5,h=h_c,d_rho00=drho00_c,save=False,load=True,comp='disk',**kwa
         r = np.asarray(r)
     if load:
         try: #Load existing prefactor if available
-            y = loaddata(comp,'h'+str(h)+'d_rho00'+str(d_rho00)+'pref'+str(pref),file=comp+'.hdf5',**kwargs)[1]
-            x = loaddata(comp,'h'+str(h)+'d_rho00'+str(d_rho00)+'pref'+str(pref),file=comp+'.hdf5',**kwargs)[0]
+            y = loaddata(comp,'h'+str(h)+'d_rho00'+str(d_rho00)+'pref'+str(pref),file=filename,**kwargs)[1]
+            x = loaddata(comp,'h'+str(h)+'d_rho00'+str(d_rho00)+'pref'+str(pref),file=filename,**kwargs)[0]
             b = inter.InterpolatedUnivariateSpline(x,y,k=3) #k is the order of the polynomial
             return b(r)
         except KeyError: #If unable to load, load 1 instead and apply a prefactor retroactively
             try:
-                y = pref*loaddata(comp,'h'+str(h)+'d_rho00'+str(d_rho00)+'pref1',file=comp+'.hdf5',**kwargs)[1]
-                x = loaddata(comp,'h'+str(h)+'d_rho00'+str(d_rho00)+'pref1',file=comp+'.hdf5',**kwargs)[0]
+                y = pref*loaddata(comp,'h'+str(h)+'d_rho00'+str(d_rho00)+'pref1',file=filename,**kwargs)[1]
+                x = loaddata(comp,'h'+str(h)+'d_rho00'+str(d_rho00)+'pref1',file=filename,**kwargs)[0]
                 b = inter.InterpolatedUnivariateSpline(x,y,k=3) #k is the order of the polynomial
                 return b(r)
             except KeyError: #And if still unable to load, calculate and save.
@@ -483,7 +464,7 @@ def d_v(r,pref=0.5,h=h_c,d_rho00=drho00_c,save=False,load=True,comp='disk',**kwa
         r = np.asarray(r)
         a = np.sqrt(-r*d_Fv(r,h,d_rho00,pref))
         a[np.isnan(a)] = 0
-        savedata(r,a,comp,'h'+str(h)+'d_rho00'+str(d_rho00)+'pref'+str(pref),file=comp+'.hdf5',**kwargs)
+        savedata(r,a,comp,'h'+str(h)+'d_rho00'+str(d_rho00)+'pref'+str(pref),file=cfilename,**kwargs)
         return a
     else:
         a = np.sqrt(-r*d_Fv(r,h,d_rho00,pref))
@@ -514,13 +495,13 @@ def g_thief(r,pref=1):
 ################################
 ############ Total #############
 ################################
-def v(r,M=Mbh_def,re=re_c,h=h_c,d_rho00=drho00_c,pref=1,rc=h_rc,h_rho00=hrho00_c,save=False,load=True,comp='total',**kwargs): 
+def v(r,M=Mbh_def,re=re_c,h=h_c,d_rho00=drho00_c,pref=1,rc=h_rc,h_rho00=hrho00_c,save=False,load=True,comp='total',filename=comp+'.hdf5',**kwargs): 
     if isinstance(r,float) or isinstance(r,int):
         r = np.asarray([r])
     if load:
         try: #Load if exists
-            y = loaddata(comp,'Mbh'+str(M)+'re'+str(re)+'h'+str(h)+'d_rho00'+str(d_rho00)+'pref'+str(pref) +'rc'+str(rc)+'h_rho00'+str(h_rho00), file=comp+'.hdf5',**kwargs)[1]
-            x = loaddata(comp,'Mbh'+str(M)+'re'+str(re)+'h'+str(h)+'d_rho00'+str(d_rho00)+'pref'+str(pref) +'rc'+str(rc)+'h_rho00'+str(h_rho00), file=comp+'.hdf5', **kwargs)[0]
+            y = loaddata(comp,'Mbh'+str(M)+'re'+str(re)+'h'+str(h)+'d_rho00'+str(d_rho00)+'pref'+str(pref) +'rc'+str(rc)+'h_rho00'+str(h_rho00), file=filename,**kwargs)[1]
+            x = loaddata(comp,'Mbh'+str(M)+'re'+str(re)+'h'+str(h)+'d_rho00'+str(d_rho00)+'pref'+str(pref) +'rc'+str(rc)+'h_rho00'+str(h_rho00), file=filename, **kwargs)[0]
             b = inter.InterpolatedUnivariateSpline(x,y,k=3)
             return b(r)
         except KeyError: #If does not exist,
@@ -542,7 +523,7 @@ def v(r,M=Mbh_def,re=re_c,h=h_c,d_rho00=drho00_c,pref=1,rc=h_rc,h_rho00=hrho00_c
     a = np.sqrt(np.sqrt(h_v(r,rc,h_rho00,load,save)**2+d_v(r,h,d_rho00,pref,load,save)**2+bh_v(r,M,load,save)**2+b_v(r,re,load,save)**2))
     a[np.isnan(a)] = 0
     if save: #not elif since that would mean don't check if load was true, which I don't want in this case
-        savedata(r,a,comp,'Mbh'+str(M)+'re'+str(re)+'h'+str(h)+'d_rho00'+str(d_rho00)+'pref'+str(pref) +'rc'+str(rc)+'h_rho00'+str(h_rho00),file=comp+'.hdf5',**kwargs)
+        savedata(r,a,comp,'Mbh'+str(M)+'re'+str(re)+'h'+str(h)+'d_rho00'+str(d_rho00)+'pref'+str(pref) +'rc'+str(rc)+'h_rho00'+str(h_rho00),file=filename,**kwargs)
         return a
     elif not load: #If load was false,
         return a
