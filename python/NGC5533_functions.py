@@ -173,7 +173,7 @@ def checkfile(group='all',path=defaultpath,file='Inputs.hdf5'):
 ################################
 
 def bh_v(r,M=Mbh_def,save=False,load=True,comp='blackhole',filename='PLACEHOLDER_DO_NOT_USE',**kwargs): #M in solar masses, r in kpc
-     if filename == 'PLACEHOLDER_DO_NOT_USE':
+    if filename == 'PLACEHOLDER_DO_NOT_USE':
         filename = comp+'.hdf5'
     if isinstance(r,float) or isinstance(r,int):
         r = np.asarray([r])
