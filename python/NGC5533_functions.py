@@ -172,7 +172,9 @@ def checkfile(group='all',path=defaultpath,file='Inputs.hdf5'):
 ######### Black Hole ###########
 ################################
 
-def bh_v(r,M=Mbh_def,save=False,load=True,comp='blackhole',filename=comp+'.hdf5',**kwargs): #M in solar masses, r in kpc
+def bh_v(r,M=Mbh_def,save=False,load=True,comp='blackhole',filename='PLACEHOLDER_DO_NOT_USE',**kwargs): #M in solar masses, r in kpc
+     if filename == 'PLACEHOLDER_DO_NOT_USE':
+        filename = comp+'.hdf5'
     if isinstance(r,float) or isinstance(r,int):
         r = np.asarray([r])
     if isinstance(r,list):
@@ -223,7 +225,9 @@ def b_vsquarev(r,n=n_c,re=re_c):
     a = np.vectorize(b_vsquare)
     return a(r,n,re)
 
-def b_v(r,n=n_c,re=re_c,save=False,load=True,comp='bulge',filename=comp+'.hdf5'**kwargs):
+def b_v(r,n=n_c,re=re_c,save=False,load=True,comp='bulge',filename='PLACEHOLDER_DO_NOT_USE'**kwargs):
+    if filename == 'PLACEHOLDER_DO_NOT_USE':
+        filename = comp+'.hdf5'
     if isinstance(r,float) or isinstance(r,int):
         r = np.asarray([r])
     if load:
@@ -273,7 +277,9 @@ def h_vcasertano(r,z,rc=h_rc,rho00=hrho00_c,gamma=h_gamma):                     
 def h_vjimenez(r,rc=h_rc,rho00=hrho00_c):
     return np.sqrt(4*np.pi*G*rho00*(rc**2)*(1-((rc/r)*np.arctan(r/rc))))
 
-def h_vNFW(r,save=True,comp='hNFW',filename=comp+'.hdf5'**kwargs):
+def h_vNFW(r,save=True,comp='hNFW',filename='PLACEHOLDER_DO_NOT_USE'**kwargs):
+    if filename == 'PLACEHOLDER_DO_NOT_USE':
+        filename = comp+'.hdf5'
     rho = lambda r: rho_s/((r/rs)*((1+r/rs)**2))
     f = lambda R: 4*np.pi*rho(R)*(R**2)          #NFW Density Profile
     mdm = lambda r: si.quad(f, 0, r)[0]          #M(r)
@@ -289,7 +295,9 @@ def h_vNFW(r,save=True,comp='hNFW',filename=comp+'.hdf5'**kwargs):
     else:
         return a(r)
 
-def h_viso(r,rc=h_rc,rho00=hrho00_c,load=True,save=False,comp='halo',filename=comp+'.hdf5',**kwargs):   #h_v iso
+def h_viso(r,rc=h_rc,rho00=hrho00_c,load=True,save=False,comp='halo',filename='PLACEHOLDER_DO_NOT_USE',**kwargs):   #h_v iso
+    if filename == 'PLACEHOLDER_DO_NOT_USE':
+        filename = comp+'.hdf5'
     if isinstance(r,float) or isinstance(r,int):
         r = np.asarray([r])
     a = np.zeros(len(r))
@@ -426,8 +434,10 @@ d_Fv = np.vectorize(d_F)
 #NOTE: The order of variables for d_v is different than above, and is different from how they are listed in the load/save.
 #This should not adversely affect anything, just be careful that you have inputs in the correct order for the given function.
 #This was done for conveneince; pref is now first and easy to call as the only non-default.
-def d_v(r,pref=0.5,h=h_c,d_rho00=drho00_c,save=False,load=True,comp='disk',filename=comp+'.hdf5',**kwargs): #velocity
+def d_v(r,pref=0.5,h=h_c,d_rho00=drho00_c,save=False,load=True,comp='disk',filename='PLACEHOLDER_DO_NOT_USE',**kwargs): #velocity
     #Matches Casertano
+    if filename == 'PLACEHOLDER_DO_NOT_USE':
+        filename = comp+'.hdf5'
     if isinstance(r,float) or isinstance(r,int):
         r = np.asarray([r])
     if isinstance(r,list):
@@ -495,7 +505,9 @@ def g_thief(r,pref=1):
 ################################
 ############ Total #############
 ################################
-def v(r,M=Mbh_def,re=re_c,h=h_c,d_rho00=drho00_c,pref=1,rc=h_rc,h_rho00=hrho00_c,save=False,load=True,comp='total',filename=comp+'.hdf5',**kwargs): 
+def v(r,M=Mbh_def,re=re_c,h=h_c,d_rho00=drho00_c,pref=1,rc=h_rc,h_rho00=hrho00_c,save=False,load=True,comp='total',filename='PLACEHOLDER_DO_NOT_USE',**kwargs): 
+    if filename == 'PLACEHOLDER_DO_NOT_USE':
+        filename = comp+'.hdf5'
     if isinstance(r,float) or isinstance(r,int):
         r = np.asarray([r])
     if load:
