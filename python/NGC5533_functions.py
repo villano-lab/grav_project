@@ -225,7 +225,7 @@ def b_vsquarev(r,n=n_c,re=re_c):
     a = np.vectorize(b_vsquare)
     return a(r,n,re)
 
-def b_v(r,n=n_c,re=re_c,save=False,load=True,comp='bulge',filename='PLACEHOLDER_DO_NOT_USE'**kwargs):
+def b_v(r,n=n_c,re=re_c,save=False,load=True,comp='bulge',filename='PLACEHOLDER_DO_NOT_USE',**kwargs):
     if filename == 'PLACEHOLDER_DO_NOT_USE':
         filename = comp+'.hdf5'
     if isinstance(r,float) or isinstance(r,int):
@@ -277,7 +277,7 @@ def h_vcasertano(r,z,rc=h_rc,rho00=hrho00_c,gamma=h_gamma):                     
 def h_vjimenez(r,rc=h_rc,rho00=hrho00_c):
     return np.sqrt(4*np.pi*G*rho00*(rc**2)*(1-((rc/r)*np.arctan(r/rc))))
 
-def h_vNFW(r,save=True,comp='hNFW',filename='PLACEHOLDER_DO_NOT_USE'**kwargs):
+def h_vNFW(r,save=True,comp='hNFW',filename='PLACEHOLDER_DO_NOT_USE',**kwargs):
     if filename == 'PLACEHOLDER_DO_NOT_USE':
         filename = comp+'.hdf5'
     rho = lambda r: rho_s/((r/rs)*((1+r/rs)**2))
