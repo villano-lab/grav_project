@@ -474,7 +474,7 @@ def d_v(r,pref=0.5,h=h_c,d_rho00=drho00_c,save=False,load=True,comp='disk',filen
         r = np.asarray(r)
         a = np.sqrt(-r*d_Fv(r,h,d_rho00,pref))
         a[np.isnan(a)] = 0
-        savedata(r,a,comp,'h'+str(h)+'d_rho00'+str(d_rho00)+'pref'+str(pref),file=cfilename,**kwargs)
+        savedata(r,a,comp,'h'+str(h)+'d_rho00'+str(d_rho00)+'pref'+str(pref),file=filename,**kwargs)
         return a
     else:
         a = np.sqrt(-r*d_Fv(r,h,d_rho00,pref))
