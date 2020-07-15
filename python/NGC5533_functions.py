@@ -18,7 +18,7 @@ except ModuleNotFoundError:
     h5py = 0
     print("Could not find h5py. Datasets will not be able to be saved or loaded using NGC5533_functions.")
 #-----------For path detection-----------
-#import subprocess
+import subprocess
 #def getGitRoot():
 #    return subprocess.Popen(['git', 'rev-parse', '--show-toplevel'], stdout=subprocess.PIPE).communicate()[0].rstrip().decode('utf-8')
 #The above only functions correctly on Linux machines and has therefore been removed.
@@ -33,10 +33,13 @@ G = 4.30091e-6    #gravitational constant (kpc/solar mass*(km/s)^2)
 rhocrit = 9.3e-18 #critical density of the Universe (kg/km^3)
 
 #---------Measured Directly-----------
-L = 3.27e10                              #luminosity (Solar Luminosities) for BULGE
-absmag = -22.02                          #absolute magnitude
-magsun = 4.42                            #absolute magnitude of the sun
-L0 = np.power(10, (0.4*(magsun-absmag))) #Absolute Magnitude to luminosity for DISK
+absmagd = -22.02                         #absolute magnitude for DISK
+absmagb = -21.66                         #absolute magnitude for BULGE
+#magsun = 4.42                            #absolute magnitude of the sun IN R-BAND
+magsun = 4.75                            #absolute magnitude of the sun BOLOMETRIC
+#Bolometric is necessary to get the correct units of L_Sun. If we use the R-Band solar magnitude, our units will change!
+L0 = np.power(10, (0.4*(magsun-absmagd)))#Absolute Magnitude to luminosity for DISK
+L = np.power(10, (0.4*(magsun-absmagb)))   #luminosity (Solar Luminosities) of BULGE
 
 #---------Measured Indirectly---------
 ups = 2.8                         #bulge mass-to-light ratio (Solar Mass/Solar Luminosity)???
