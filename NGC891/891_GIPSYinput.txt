@@ -1,0 +1,86 @@
+First Round of Gipsy Input
+
+I accidentally ignored the mass input for all of these...
+********************************************************************************
+DISK
+********************************************************************************
+
+disk
+zlaw=sech-squared
+Z0=0.50
+Surface densities=Y
+UNITS=KPC,MSUN/PC**2
+RADDENS=<grav_project/testing/891_diskComp
+RADII= 0,0.88, 2.22, 3.11, 4.00, 4.89, 5.78, 6.67, 7.56, 8.44, 9.33, 
+       10.22, 11.11, 12.00, 12.89, 13.78, 14.67, 15.56, 16.44
+
+Saved File as testing/891_thinDisk
+
+
+disk
+zlaw=sech-squared
+Z0=1.60
+Surface densities=Y
+UNITS=KPC,MSUN/PC**2
+RADDENS<grav_project/testing/891_diskComp
+RADII= 0,0.88, 2.22, 3.11, 4.00, 4.89, 5.78, 6.67, 7.56, 8.44, 9.33, 
+       10.22, 11.11, 12.00, 12.89, 13.78, 14.67, 15.56, 16.44
+
+Saved File as testing/891_thickDisk2
+(saved as thickDisk2 because I entered the RADII wrong the first time)
+
+*************************************************************************************
+GAS
+*************************************************************************************
+
+disk
+zlaw=sech-squared
+Z0=0.50
+Surface densities=Y
+UNITS=KPC,MSUN/PC**2
+RADDENS=<grav_project/testing/891_gasComp
+RADII= 0,0.88, 2.22, 3.11, 4.00, 4.89, 5.78, 6.67, 7.56, 8.44, 9.33, 
+       10.22, 11.11, 12.00, 12.89, 13.78, 14.67, 15.56, 16.44
+
+Saved File as testing/891_thinGas
+
+disk
+zlaw=sech-squared
+Z0=1.60
+Surface densities=Y
+UNITS=KPC,MSUN/PC**2
+RADDENS=<grav_project/testing/891_gasComp
+RADII= 0,0.88, 2.22, 3.11, 4.00, 4.89, 5.78, 6.67, 7.56, 8.44, 9.33, 
+       10.22, 11.11, 12.00, 12.89, 13.78, 14.67, 15.56, 16.44
+
+Saved File as testing/891_thickGas
+
+*************************************************************************
+Bulge (this is the only one that might be right)
+*************************************************************************
+
+bulge
+UNITS=KPC,MSUN/PC**2
+RADDENS=<grav_project/testing/891_bulgeComp
+RADII= 0,0.88, 2.22, 3.11, 4.00, 4.89, 5.78, 6.67, 7.56, 8.44, 9.33, 
+       10.22, 11.11, 12.00, 12.89, 13.78, 14.67, 15.56, 16.44
+
+Saved File as testing/891_bulge
+
+********************************************************************************
+Second Round of GIPSY
+I only tested the thin disk
+I didn't ignore the mass this time but that changed nothing
+*********************************************************************************
+
+disk
+zlaw=sech-squared
+Z0=0.50
+Surface densities=Y
+UNITS=KPC,MSUN/PC**2
+RADDENS=<grav_project/testing/891_diskComp
+MASS = 1
+RADII= 0,0.88, 2.22, 3.11, 4.00, 4.89, 5.78, 6.67, 7.56, 8.44, 9.33, 
+       10.22, 11.11, 12.00, 12.89, 13.78, 14.67, 15.56, 16.44
+
+Saved File as testing/891_thinDiskII
