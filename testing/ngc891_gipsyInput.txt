@@ -1,0 +1,47 @@
+source [1]: https://www.aanda.org/articles/aa/pdf/2011/07/aa16634-11.pdf
+run in gipsy
+
+***************************************************************************************************************************
+THIN/THICK DISK
+thin disk Z0 = 0.50
+thick disk Z0 = 1.60
+
+disk
+Zlaw = sech-squared
+Z0= 
+density profile Y
+UNITS=kpc,mag/arcsec**2
+RADDENS=<grav_project/testing/891_diskComp
+RADII=0,0.88, 2.22, 3.11, 4.00, 4.89, 5.78, 6.67, 7.56, 8.44, 9.33, 10.22, 11.11, 12.00, 12.89, 13.78, 14.67, 15.56, 16.44
+
+gipsy files saved as
+testing/891_thinDisk
+testing/891_thickDisk
+
+***************************************************************************************************************************
+THIN/THICK GAS
+thin gas Z0 = 0.50
+thick gas Z0 = 1.60
+
+disk
+Zlaw = sech-squared
+Z0= 
+density profile Y
+UNITS=kpc,mag/arcsec**2
+RADDENS=<grav_project/testing/891_gasComp
+RADII=0,0.88, 2.22, 3.11, 4.00, 4.89, 5.78, 6.67, 7.56, 8.44, 9.33, 10.22, 11.11, 12.00, 12.89, 13.78, 14.67, 15.56, 16.44
+
+gipsy files saved as
+testing/891_thinGas
+testing/891_thickGas
+
+***************************************************************************************************************************
+BULGE
+
+bulge
+UNITS=kpc,msun/pc**2
+RADDENS=<grav_project/testing/891_bulgeComp
+RADII=0,0.88, 2.22, 3.11, 4.00, 4.89, 5.78, 6.67, 7.56, 8.44, 9.33, 10.22, 11.11, 12.00, 12.89, 13.78, 14.67, 15.56, 16.44
+
+gipsy files saved as
+testing/891_bulge
