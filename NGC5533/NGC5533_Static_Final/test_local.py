@@ -20,4 +20,4 @@ def test():
     _exec_notebook('Disk_Velocity_kpc.ipynb')
     _exec_notebook('Halo_Velocity.ipynb')
     _exec_notebook('NGC5533_Total.ipynb')
-    _exec_notebook('../LibraryAutoTest.ipynb')
+    _exec_notebook('../../LibraryAutoTest.ipynb')
