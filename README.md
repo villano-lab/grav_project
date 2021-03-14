@@ -45,4 +45,5 @@ This repository hosts all code we have made to this end as well as some notes, b
 Judit Bergfalk
 Kitty Harris
 Raphael Hatami
+Rachel Vititoe
 Anthony Villano
