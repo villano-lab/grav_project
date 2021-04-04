@@ -1,0 +1,203 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 12.2' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[      7579,        193]
+NotebookOptionsPosition[      7098,        176]
+NotebookOutlinePosition[      7498,        192]
+CellTagsIndexPosition[      7455,        189]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"rhoNFW", "[", "r_", "]"}], ":=", 
+   FractionBox["rho0", 
+    RowBox[{
+     RowBox[{"(", 
+      RowBox[{"r", "/", "rcut"}], ")"}], 
+     SuperscriptBox[
+      RowBox[{"(", 
+       RowBox[{"1", "+", 
+        RowBox[{"r", "/", "rcut"}]}], ")"}], "2"]}]]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"innerintegral", "[", "r_", "]"}], ":=", 
+   RowBox[{"4", " ", "Pi", " ", 
+    SuperscriptBox["r", "2"], " ", 
+    RowBox[{"rhoNFW", "[", "r", "]"}]}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{"Integrate", "[", 
+  RowBox[{
+   RowBox[{"innerintegral", "[", "rprime", "]"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"rprime", ",", "0", ",", "r"}], "}"}]}], "]"}]}], "Input",
+ CellChangeTimes->{{3.8258831444966764`*^9, 3.8258831675935974`*^9}, {
+  3.8258865514860935`*^9, 3.8258865532802305`*^9}, {3.8258866066806803`*^9, 
+  3.8258867256063213`*^9}, {3.8258867659936085`*^9, 3.8258867998119736`*^9}, {
+  3.8258869034859905`*^9, 3.825886994313676*^9}, {3.8258922287514553`*^9, 
+  3.8258923737521777`*^9}, {3.825892418672799*^9, 3.8258924770987024`*^9}, {
+  3.8258927138857403`*^9, 3.825892740740985*^9}, {3.8258928051523013`*^9, 
+  3.8258928624607496`*^9}, {3.8258929210652676`*^9, 3.8258929467386475`*^9}, {
+  3.825892985226349*^9, 3.825893039805978*^9}, {3.825893433132264*^9, 
+  3.8258935944494095`*^9}, {3.8258936599261208`*^9, 3.8258936797353272`*^9}, {
+  3.8258940996110544`*^9, 3.825894100600459*^9}, {3.8264958744943867`*^9, 
+  3.8264959159854097`*^9}, {3.8264959554221196`*^9, 3.826496010291481*^9}, {
+  3.826496602211706*^9, 3.826496633562564*^9}},
+ CellLabel->"In[7]:=",ExpressionUUID->"27042b9e-cfa1-4553-a2e5-b055e6fb60ee"],
+
+Cell[BoxData[
+ TemplateBox[{
+   RowBox[{"4", " ", "\[Pi]", " ", 
+     SuperscriptBox["rcut", "3"], " ", "rho0", " ", 
+     RowBox[{"(", 
+       RowBox[{
+         RowBox[{"-", "1"}], "+", 
+         FractionBox["rcut", 
+          RowBox[{"r", "+", "rcut"}]], "-", 
+         RowBox[{"Log", "[", "rcut", "]"}], "+", 
+         RowBox[{"Log", "[", 
+           RowBox[{"r", "+", "rcut"}], "]"}]}], ")"}]}], 
+   InterpretationBox[
+    DynamicModuleBox[{Typeset`open = False}, 
+     TemplateBox[{"Expression", 
+       StyleBox[
+        TagBox[
+         TooltipBox["\"condition\"", 
+          TagBox[
+           RowBox[{
+             RowBox[{"(", 
+               RowBox[{
+                 RowBox[{"(", 
+                   RowBox[{
+                    RowBox[{
+                    RowBox[{"Re", "[", 
+                    FractionBox["rcut", "r"], "]"}], "\[GreaterEqual]", "0"}],
+                     "&&", 
+                    RowBox[{
+                    FractionBox["rcut", "r"], "\[NotEqual]", "0"}]}], ")"}], 
+                 "||", 
+                 RowBox[{
+                   FractionBox["rcut", "r"], "\[NotElement]", 
+                   TemplateBox[{}, "Reals"]}], "||", 
+                 RowBox[{
+                   RowBox[{"Re", "[", 
+                    FractionBox["rcut", "r"], "]"}], "<", 
+                   RowBox[{"-", "1"}]}]}], ")"}], "&&", 
+             RowBox[{"(", 
+               RowBox[{
+                 RowBox[{"(", 
+                   RowBox[{
+                    RowBox[{
+                    RowBox[{"Im", "[", "r", "]"}], "\[GreaterEqual]", "0"}], 
+                    "&&", 
+                    RowBox[{
+                    RowBox[{"Im", "[", "rcut", "]"}], "\[GreaterEqual]", 
+                    "0"}]}], ")"}], "||", 
+                 RowBox[{"(", 
+                   RowBox[{
+                    RowBox[{
+                    RowBox[{"Im", "[", "r", "]"}], "\[LessEqual]", "0"}], 
+                    "&&", 
+                    RowBox[{
+                    RowBox[{"Im", "[", "rcut", "]"}], "\[LessEqual]", "0"}]}],
+                    ")"}], "||", 
+                 RowBox[{
+                   FractionBox[
+                    RowBox[{"Im", "[", "rcut", "]"}], 
+                    RowBox[{"Im", "[", "r", "]"}]], "\[LessEqual]", 
+                   RowBox[{"-", "1"}]}], "||", 
+                 RowBox[{
+                   FractionBox[
+                    RowBox[{
+                    RowBox[{"Im", "[", "rcut", "]"}], " ", 
+                    RowBox[{"Re", "[", "r", "]"}]}], 
+                    RowBox[{"Im", "[", "r", "]"}]], "\[LessEqual]", 
+                   RowBox[{"Re", "[", "rcut", "]"}]}]}], ")"}]}], 
+           Short[#, 7]& ]], Annotation[#, 
+          Short[
+           And[
+            Or[
+             And[
+             Re[$CellContext`r^(-1) $CellContext`rcut] >= 
+              0, $CellContext`r^(-1) $CellContext`rcut != 0], 
+             NotElement[$CellContext`r^(-1) $CellContext`rcut, Reals], 
+             Re[$CellContext`r^(-1) $CellContext`rcut] < -1], 
+            Or[
+             And[Im[$CellContext`r] >= 0, Im[$CellContext`rcut] >= 0], 
+             And[Im[$CellContext`r] <= 0, Im[$CellContext`rcut] <= 0], 
+             Im[$CellContext`r]^(-1) Im[$CellContext`rcut] <= -1, 
+             Im[$CellContext`r]^(-1) Im[$CellContext`rcut] Re[$CellContext`r] <= 
+             Re[$CellContext`rcut]]], 7], "Tooltip"]& ], "IconizedCustomName",
+         StripOnInput -> False], 
+       GridBox[{{
+          RowBox[{
+            TagBox["\"Head: \"", "IconizedLabel"], "\[InvisibleSpace]", 
+            TagBox["And", "IconizedItem"]}]}, {
+          RowBox[{
+            TagBox["\"Byte count: \"", "IconizedLabel"], "\[InvisibleSpace]", 
+            TagBox["2400", "IconizedItem"]}]}}, 
+        GridBoxAlignment -> {"Columns" -> {{Left}}}, DefaultBaseStyle -> 
+        "Column", 
+        GridBoxItemSize -> {
+         "Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}], 
+       Dynamic[Typeset`open]}, "IconizedObject"]], 
+    And[
+     Or[
+      And[
+      Re[$CellContext`r^(-1) $CellContext`rcut] >= 
+       0, $CellContext`r^(-1) $CellContext`rcut != 0], 
+      NotElement[$CellContext`r^(-1) $CellContext`rcut, Reals], 
+      Re[$CellContext`r^(-1) $CellContext`rcut] < -1], 
+     Or[
+      And[Im[$CellContext`r] >= 0, Im[$CellContext`rcut] >= 0], 
+      And[Im[$CellContext`r] <= 0, Im[$CellContext`rcut] <= 0], 
+      Im[$CellContext`r]^(-1) Im[$CellContext`rcut] <= -1, 
+      Im[$CellContext`r]^(-1) Im[$CellContext`rcut] Re[$CellContext`r] <= 
+      Re[$CellContext`rcut]]], SelectWithContents -> True, Selectable -> 
+    False]},
+  "ConditionalExpression"]], "Output",
+ CellChangeTimes->{
+  3.826496025004777*^9, {3.826496625848316*^9, 3.8264966424913096`*^9}},
+ CellLabel->"Out[9]=",ExpressionUUID->"9334ce5f-7e37-4a7f-9d03-1c953c8e4d8f"]
+}, Open  ]]
+},
+WindowSize->{949, 467},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"12.2 for Microsoft Windows (64-bit) (December 12, 2020)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"ee86c53a-6084-4786-af60-38d0fa10c9a2"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[580, 22, 1697, 36, 88, "Input",ExpressionUUID->"27042b9e-cfa1-4553-a2e5-b055e6fb60ee"],
+Cell[2280, 60, 4802, 113, 82, "Output",ExpressionUUID->"9334ce5f-7e37-4a7f-9d03-1c953c8e4d8f"]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)
+
