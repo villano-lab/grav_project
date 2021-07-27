@@ -23,6 +23,7 @@ def CalculatePosition(radius,velocity,time,dt):
         t += dt
         x = radius * np.cos((velocity/radius)*t)
         y = radius * np.sin((velocity/radius)*t)
+        
         xposition.append(x)
         yposition.append(y)
         storedtime.append(t)
@@ -39,6 +40,32 @@ def CalculatePosition(radius,velocity,time,dt):
 def MultiplePositions(radius,velocity,time,dt):
     """Calculate positions of multiple objects around a circle."""
     
+    # Stop the calculation when the outermost point takes a whole revolution
+    # Outermost point position
+    outerposition = radius[len(radius)-1]
+    
+    # Calculate the positions of outermost point:
+    xouter = CalculatePosition(radius[len(radius)-1],velocity[len(radius)-1],time,dt)[0]
+    
+    # Circumference of the outer circle
+    circouter = 2*np.pi*outerposition
+    
+    # Distance the outer object traveled
+    distance = 0
+    istop = 0
+        
+    # New time
+    storedtime = CalculatePosition(radius[0],velocity[0],time,dt)[2]
+    for t in storedtime:
+        if distance < circouter:
+            distance = velocity[len(radius)-1]*t
+        else:
+            istop = np.where(storedtime == t)[0]     # find index of the numpy array 
+            break
+                   
+    istop = int(istop)
+    newstoredtime = storedtime[:istop-1]
+            
     xmultiple = []
     ymultiple = []
 
@@ -51,7 +78,7 @@ def MultiplePositions(radius,velocity,time,dt):
     xmultiple = np.array(xmultiple)
     ymultiple = np.array(ymultiple)
     
-    return xmultiple, ymultiple
+    return xmultiple, ymultiple, newstoredtime
 
 ###############################################
 
@@ -96,7 +123,8 @@ def MakeAnimation(radius,velocity,time,dt,filename,title,
     # Extract x and y positions, and time
     xpositions = MultiplePositions(radius,velocity,time,dt)[0]
     ypositions = MultiplePositions(radius,velocity,time,dt)[1]
-    storedtimes = CalculatePosition(radius,velocity,time,dt)[2]
+    #storedtimes = CalculatePosition(radius,velocity,time,dt)[2]
+    storedtimes = MultiplePositions(radius,velocity,time,dt)[2]
     
     # Sizes of dots based on masses
     if size == True:   # use an array of masses as an input for sizes
@@ -121,8 +149,6 @@ def MakeAnimation(radius,velocity,time,dt,filename,title,
     ax.spines['top'].set_color('white')
     ax.spines['left'].set_color('white')
     ax.spines['right'].set_color('white')
-    ax.tick_params(axis='x', colors='white')
-    ax.tick_params(axis='y', colors='white')
   
     # Convert filename and title to string
     filename = str(filename)
@@ -146,6 +172,8 @@ def MakeAnimation(radius,velocity,time,dt,filename,title,
             plt.ylim(-np.max(radius)-1,np.max(radius)+ylim)
             plt.xlabel('x (km)',color='white',fontsize='14')
             plt.ylabel('y (km)',color='white',fontsize='14')
+            ax.tick_params(axis='x', colors='white')
+            ax.tick_params(axis='y', colors='white')
             i += 1
             
             # Save the current plot as a movie frame
