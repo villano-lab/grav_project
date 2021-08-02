@@ -29,6 +29,6 @@ install:
 before_script: cd NGC5533/NGC5533_Static_Final
 
 script:
-- travis_wait 45 py.test
+- travis_wait 60 py.test
 - cd ../../fitting/Static_Notebooks
 - travis_wait 60 py.test
