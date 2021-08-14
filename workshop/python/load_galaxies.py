@@ -9,7 +9,7 @@ sys.path.append('../python/')
 import dataPython         as dp
 import numpy              as np
 import scipy.interpolate  as inter
-import matplotlib.pyplot as plt
+import matplotlib.pyplot  as plt
 
 ###############################
 ########### NGC5533 ###########
@@ -102,6 +102,12 @@ NGC5533['gas'] = {
 NGC5533['gas']['t'], NGC5533['gas']['c'], NGC5533['gas']['k'] = inter.splrep(NGC5533['gas']['r'], NGC5533['gas']['v'])
 NGC5533['gas']['spline'] = inter.BSpline(NGC5533['gas']['t'], NGC5533['gas']['c'], NGC5533['gas']['k'])
 
+# Parameters ########################
+NGC5533['galaxyname'] = 5533       # NGC catalog number of the galaxy
+NGC5533['rho0'] = 0.31e9       # central mass density (in solar mass/kpc^3), Source: Noordermeer (2007)     
+NGC5533['rc'] = 1.4            # core radius (in kpc), Source: Noordermeer (2007)
+NGC5533['massbh'] = 2.7e9      # mass of central black hole (in solar masses), Source: Noordermeer (2007)
+
 ###############################
 ########### NGC0891 ###########
 ###############################
@@ -113,4 +119,5 @@ NGC0891 = {
 #Organize measured data
 NGC0891['m_radii']      = NGC0891['measured_data']['xx']
 NGC0891['m_velocities'] = NGC0891['measured_data']['yy']
+NGC0891['m_r_errors']   = NGC0891['measured_data']['ex']
 NGC0891['m_v_errors']   = NGC0891['measured_data']['ey']
