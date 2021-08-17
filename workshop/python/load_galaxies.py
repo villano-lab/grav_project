@@ -34,11 +34,11 @@ NGC5533 = {
     'raw_disk'         : dp.getXYdata('data/NGC5533/noord-120kpc-disk.txt'      ),
     'raw_halo'         : dp.getXYdata('data/NGC5533/noord-120kpc-halo.txt'      ),
     'raw_gas'          : dp.getXYdata('data/NGC5533/noord-120kpc-gas.txt'       ),
-    'raw_band_btm' : dp.getXYdata('data/NGC5533/noord-120kpc-bottomband.txt'),
-    'raw_band_top' : dp.getXYdata('data/NGC5533/noord-120kpc-topband.txt'   ),
+    'raw_band_btm'     : dp.getXYdata('data/NGC5533/noord-120kpc-bottomband.txt'),
+    'raw_band_top'     : dp.getXYdata('data/NGC5533/noord-120kpc-topband.txt'   ),
 
     # Get data from 100kpc file
-    'measured_data': dp.getXYdata_wXYerr('data/NGC5533/100kpc_data.txt')
+    'measured_data'    : dp.getXYdata_wXYerr('data/NGC5533/100kpc_data.txt')
         
 }
 
@@ -130,7 +130,7 @@ NGC0891 = {
     'raw_gas'          : dp.getXYdata('data/NGC0891/891_dtGas.dat'       ),
 
     # Get data
-    'measured_data' : dp.getXYdata_wXYerr('data/NGC0891/891_data')
+    'measured_data'    : dp.getXYdata_wXYerr('data/NGC0891/891_data')
 }
 
 # Parameters ########################
@@ -185,7 +185,7 @@ NGC7814 = {
     'raw_gas'          : dp.getXYdata('data/NGC7814/7814reallygas.dat'       ),
 
     # Get data
-    'measured_data' : dp.getXYdata_wXYerr('data/NGC7814/ngc7814data')
+    'measured_data'    : dp.getXYdata_wXYerr('data/NGC7814/ngc7814data')
 }
 
 # Parameters ########################
@@ -240,7 +240,7 @@ NGC5005 = {
     'raw_gas'          : dp.getXYdata('data/NGC5005/ngc5005_gas.txt'       ),
 
     # Get data
-    'measured_data' : dp.getXYdata_wXYerr('data/NGC5005/ngc5005_data.txt')
+    'measured_data'    : dp.getXYdata_wXYerr('data/NGC5005/ngc5005_data.txt')
 }
 
 #Organize measured data
