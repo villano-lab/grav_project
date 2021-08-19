@@ -17,6 +17,7 @@ import matplotlib.pyplot  as plt
 
 # Equation for dark matter halo velocity
 def halo_v(r,rho0,rc):
+    G = 4.300e-6                        # Gravitational constant (kpc/solar mass*(km/s)^2)
     v = np.sqrt(4*np.pi*G*rho0*rc**2*(1 - rc/r * np.arctan(r/rc)))
     return v
 
@@ -172,6 +173,7 @@ NGC0891['gas'] = {
 NGC0891['gas']['t'], NGC0891['gas']['c'], NGC0891['gas']['k'] = inter.splrep(NGC0891['gas']['r'], NGC0891['gas']['v'])
 NGC0891['gas']['spline'] = inter.BSpline(NGC0891['gas']['t'], NGC0891['gas']['c'], NGC0891['gas']['k'])
 
+NGC891 = NGC0891    # Considering when someone forgets to type 0
 
 ###############################
 ########### NGC7814 ###########
@@ -291,6 +293,13 @@ NGC5005['massbh'] = 0       # mass of central black hole (in solar masses)
 ###############################
 ####### Other Galaxies ########
 ###############################
+
+# NGC 3198
+NGC3198 = {'measured_data' : dp.getXYdata_wYerr('data/othergalaxies/NGC3198.txt')}
+NGC3198['m_radii']      = NGC3198['measured_data']['xx']
+NGC3198['m_velocities'] = NGC3198['measured_data']['yy']
+NGC3198['m_v_errors']   = NGC3198['measured_data']['ey']
+NGC3198['galaxyname'] = 'NGC 3198' 
 
 # UGC 89
 UGC89 = {'measured_data' : dp.getXYdata_wYerr('data/othergalaxies/UGC89.txt')}
