@@ -11,15 +11,6 @@ import numpy              as np
 import scipy.interpolate  as inter
 import matplotlib.pyplot  as plt
 
-###############################
-###### Dark Matter Halo #######
-###############################
-
-# Equation for dark matter halo velocity
-def halo_v(r,rho0,rc):
-    G = 4.300e-6                        # Gravitational constant (kpc/solar mass*(km/s)^2)
-    v = np.sqrt(4*np.pi*G*rho0*rc**2*(1 - rc/r * np.arctan(r/rc)))
-    return v
 
 ###############################
 ########### NGC5533 ###########
@@ -209,6 +200,32 @@ NGC7814['bulge']['spline'] = inter.BSpline(NGC7814['bulge']['t'], NGC7814['bulge
 NGC7814['disk'] = {
     'r' : np.asarray(NGC7814['raw_disk']['xx']),
     'v' : np.asarray(NGC7814['raw_disk']['yy'])
+}
+NGC7814['disk']['t'], NGC7814['disk']['c'], NGC7814['disk']['k'] = inter.splrep(NGC7814['disk']['r'], NGC7814['disk']['v'])
+NGC7814['disk']['spline'] = inter.BSpline(NGC7814['disk']['t'], NGC7814['disk']['c'], NGC7814['disk']['k'])
+
+# Gas ###############################
+NGC7814['gas'] = {
+    'r' : np.asarray(NGC7814['raw_gas']['xx']),
+    'v' : np.asarray(NGC7814['raw_gas']['yy'])
+}
+NGC7814['gas']['t'], NGC7814['gas']['c'], NGC7814['gas']['k'] = inter.splrep(NGC7814['gas']['r'], NGC7814['gas']['v'])
+NGC7814['gas']['spline'] = inter.BSpline(NGC7814['gas']['t'], NGC7814['gas']['c'], NGC7814['gas']['k'])
+
+
+###############################
+########### NGC5005 ###########
+###############################
+
+NGC5005 = {
+    
+    'raw_bulge'        : dp.getXYdata('data/NGC5005/ngc5005_bulge.txt'     ),
+    'raw_disk'         : dp.getXYdata('data/NGC5005/ngc5005_disk.txt'      ),
+    'raw_halo'         : dp.getXYdata('data/NGC5005/ngc5005_halo.txt'      ),
+    'raw_gas'          : dp.getXYdata('data/NGC5005/ngc5005_gas.txt'       ),
+
+    # Get data
+    'measured_data'    : dp.getXYdata_wXYerr('data/NGC5005/ngc5005_data.txt')
 }
 NGC7814['disk']['t'], NGC7814['disk']['c'], NGC7814['disk']['k'] = inter.splrep(NGC7814['disk']['r'], NGC7814['disk']['v'])
 NGC7814['disk']['spline'] = inter.BSpline(NGC7814['disk']['t'], NGC7814['disk']['c'], NGC7814['disk']['k'])
